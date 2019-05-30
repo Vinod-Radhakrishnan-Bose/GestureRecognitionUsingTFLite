@@ -224,7 +224,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
            //Setting a delay of 2.5 second before the recording will start. This is to ensure user is ready to start performing the activity.A beep sound will also sound once the recording starts or stops
                 delay(2.5){
                     AudioServicesPlaySystemSound(self.systemSoundID)
-                    self.startTimer()
                     self.active.accelX.removeAll()
                     self.active.accelY.removeAll()
                     self.active.accelZ.removeAll()
@@ -237,16 +236,12 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
                     self.active.prevGyroSensorTimeStamp = 0
                     self.active.maxAccelSensorTimeStamp = 0
                     self.active.maxGyroSensorTimeStamp = 0
-                    self.delay(3.2)
-                    {
-                        self.Result()
-                        //self.updateGraph()
-                    }
                     self.startStopButton.backgroundColor = .red
                     self.startStopButton.setTitle("Stop Recording", for: .normal)
                     self.fileStartRecordTimeStamp = self.getCurrentTimeStamp()
                     self.setUpDataCollectionLogFiles()
                     self.dataCollectionStaretd = true
+                    self.startTimer()
                 }
             }
     }
@@ -274,6 +269,10 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         myTimer.text = String(counter)
         self.updateGraph()
 
+        // perform inferencing every 4 seconds
+        if counter % 4 == 0 {
+            self.Result()
+        }
        //after 60 secs, recording will stop automatically. Beep will sound.
         if counter == 60
         {
@@ -307,14 +306,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     func Result() {
 
         var accelBytes : [Float] = []
-        /*active.accelX = Array(active.accelX.suffix(80))
-        active.accelY = Array(active.accelY.suffix(80))
-        active.accelZ = Array(active.accelZ.suffix(80))
-        active.accelTimeStamp = Array(active.accelTimeStamp.suffix(80))
-        active.gyroX = Array(active.gyroX.suffix(120))
-        active.gyroY = Array(active.gyroY.suffix(120))
-        active.gyroZ = Array(active.gyroZ.suffix(120))
-        active.gyroTimeStamp = Array(active.gyroTimeStamp.suffix(120))*/
         self.active.mainData = (self.active.accelX.suffix(80) + self.active.accelY.suffix(80) + self.active.accelZ.suffix(80))
         //active.mainData = (active.gyroX.suffix(120) + active.gyroZ.suffix(120))// + self.active.accelZ)
 
@@ -323,26 +314,9 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         }
         // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
         let result = modelDataHandler?.runModel(input: Data(buffer: UnsafeBufferPointer(start: accelBytes, count: accelBytes.count)))
-        print(result)
-        print(result?.inferences[0].label)
        //Changing the text of the predictionLabel
         predictionLabel.text = result?.inferences[0].label//prediction?.classLabel
         confidenceLabel.text = String(describing : Int16((result?.inferences[0].confidence ?? 0.0) * 100.0)) + "%\n"
-        /*print("Predicted label:")
-        print(prediction?.classLabel ?? "No prediction possible")
-        print("Probability per label:")
-        print(prediction?.output ?? "No prediction possible")*/
-        
-       //Delay of 4 seconds before second prediction takes place.
-        delay(4)
-        {
-            if (self.dataCollectionStaretd)
-            {
-               self.Result()
-               //self.updateGraph()
-            }
-        }
-    
     }
 
     @IBAction func emailData(_ sender: Any) {
