@@ -141,9 +141,9 @@
 		C568AC4D21AC6E2F00FFE42E /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				248BBE7922A03FED003856C5 /* Main.storyboard */,
 				C568AC4E21AC6E2F00FFE42E /* Assets.xcassets */,
 				C568AC4F21AC6E2F00FFE42E /* LaunchScreen.storyboard */,
+				248BBE7922A03FED003856C5 /* Main.storyboard */,
 			);
 			path = Resources;
 			sourceTree = "<group>";

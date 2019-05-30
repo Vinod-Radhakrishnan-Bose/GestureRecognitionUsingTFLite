@@ -345,6 +345,39 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     
     }
 
+    @IBAction func emailData(_ sender: Any) {
+        
+        if( MFMailComposeViewController.canSendMail() ) {
+            print("Can send email")
+            
+            let mailComposer = MFMailComposeViewController()
+            mailComposer.mailComposeDelegate = self
+            
+            //Set the subject and message of the email
+            mailComposer.setSubject("IMU Data")
+            mailComposer.setMessageBody("Kindly find sample data in the attachment", isHTML: false)
+            
+            
+            if let AccelData = NSData(contentsOf: fileURLAccel!) {
+                print("Accel Data loaded.")
+                
+                mailComposer.addAttachmentData(AccelData as Data, mimeType: "text/txt", fileName: fileNameAccel)
+            }
+            
+            if let GyroData = NSData(contentsOf: fileURLGyro!) {
+                print("Gyro Data path loaded.")
+                
+                mailComposer.addAttachmentData(GyroData as Data, mimeType: "text/txt", fileName: fileNameGyro)
+                
+            }
+            
+            self.navigationController?.present(mailComposer, animated: true, completion: nil)
+        }
+    }
+    
+    func mailComposeController(_ controller: MFMailComposeViewController, didFinishWith result: MFMailComposeResult, error: Error?) {
+        controller.dismiss(animated: true)
+    }
     //Empty the buffer if stop button gets called
     func stopResult()
     {
