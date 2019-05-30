@@ -1,0 +1,190 @@
+
+Examples/BasicExample/Pods/Charts/LICENSE
+Examples/BasicExample/Pods/Charts/README.md
+Examples/BasicExample/Pods/Charts/Source/Charts/Animation/Animator.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Animation/ChartAnimationEasing.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/BarChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/BarLineChartViewBase.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/BubbleChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/CandleStickChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/ChartViewBase.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/CombinedChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/HorizontalBarChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/LineChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/PieChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/PieRadarChartViewBase.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/RadarChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Charts/ScatterChartView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/AxisBase.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/ChartLimitLine.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/ComponentBase.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/Description.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/IMarker.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/Legend.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/LegendEntry.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/MarkerImage.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/MarkerView.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/XAxis.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Components/YAxis.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/ChartBaseDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/BarChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/BarChartDataEntry.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/BarChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/BarLineScatterCandleBubbleChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/BarLineScatterCandleBubbleChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/BubbleChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/BubbleChartDataEntry.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/BubbleChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/CandleChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/CandleChartDataEntry.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/CandleChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/ChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/ChartDataEntry.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/ChartDataEntryBase.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/ChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/CombinedChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/LineChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/LineChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/LineRadarChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/LineScatterCandleRadarChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/PieChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/PieChartDataEntry.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/PieChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/RadarChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/RadarChartDataEntry.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/RadarChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/ScatterChartData.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Implementations/Standard/ScatterChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/IBarChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/IBarLineScatterCandleBubbleChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/IBubbleChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/ICandleChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/IChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/ILineChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/ILineRadarChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/ILineScatterCandleRadarChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/IPieChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/IRadarChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Data/Interfaces/IScatterChartDataSet.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Filters/DataApproximator+N.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Filters/DataApproximator.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Formatters/DefaultAxisValueFormatter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Formatters/DefaultFillFormatter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Formatters/DefaultValueFormatter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Formatters/IAxisValueFormatter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Formatters/IFillFormatter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Formatters/IndexAxisValueFormatter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Formatters/IValueFormatter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/BarHighlighter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/ChartHighlighter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/CombinedHighlighter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/Highlight.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/HorizontalBarHighlighter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/IHighlighter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/PieHighlighter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/PieRadarHighlighter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/RadarHighlighter.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Highlight/Range.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Interfaces/BarChartDataProvider.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Interfaces/BarLineScatterCandleBubbleChartDataProvider.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Interfaces/BubbleChartDataProvider.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Interfaces/CandleChartDataProvider.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Interfaces/ChartDataProvider.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Interfaces/CombinedChartDataProvider.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Interfaces/LineChartDataProvider.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Interfaces/ScatterChartDataProvider.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Jobs/AnimatedMoveViewJob.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Jobs/AnimatedViewPortJob.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Jobs/AnimatedZoomViewJob.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Jobs/MoveViewJob.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Jobs/ViewPortJob.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Jobs/ZoomViewJob.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/AxisRendererBase.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/BarChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/BarLineScatterCandleBubbleRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/BubbleChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/CandleStickChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/ChartDataRendererBase.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/CombinedChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/HorizontalBarChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/LegendRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/LineChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/LineRadarRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/LineScatterCandleRadarRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/PieChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/RadarChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Renderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Scatter/ChevronDownShapeRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Scatter/ChevronUpShapeRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Scatter/CircleShapeRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Scatter/CrossShapeRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Scatter/IShapeRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Scatter/SquareShapeRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Scatter/TriangleShapeRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/Scatter/XShapeRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/ScatterChartRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/XAxisRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/XAxisRendererHorizontalBarChart.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/XAxisRendererRadarChart.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/YAxisRenderer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/YAxisRendererHorizontalBarChart.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Renderers/YAxisRendererRadarChart.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Utils/ChartColorTemplates.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Utils/ChartUtils.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Utils/Fill.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Utils/Platform+Accessibility.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Utils/Platform.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Utils/Transformer.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Utils/TransformerHorizontalBarChart.swift
+Examples/BasicExample/Pods/Charts/Source/Charts/Utils/ViewPortHandler.swift
+Examples/BasicExample/Pods/Local Podspecs/BLECore.podspec.json
+Examples/BasicExample/Pods/Local Podspecs/BoseWearable.podspec.json
+Examples/BasicExample/Pods/Local Podspecs/Logging.podspec.json
+Examples/BasicExample/Pods/Manifest.lock
+Examples/BasicExample/Pods/Pods.xcodeproj/project.pbxproj
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/BLECore.xcscheme
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/BoseWearable.xcscheme
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/Charts.xcscheme
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/Logging.xcscheme
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/Pods-BasicExample.xcscheme
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/TensorFlowLiteC.xcscheme
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/TensorFlowLiteSwift.xcscheme
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/xcschememanagement.plist
+Examples/BasicExample/Pods/Target Support Files/BLECore/BLECore.xcconfig
+Examples/BasicExample/Pods/Target Support Files/BoseWearable/BoseWearable.xcconfig
+Examples/BasicExample/Pods/Target Support Files/Charts/Charts-dummy.m
+Examples/BasicExample/Pods/Target Support Files/Charts/Charts-Info.plist
+Examples/BasicExample/Pods/Target Support Files/Charts/Charts-prefix.pch
+Examples/BasicExample/Pods/Target Support Files/Charts/Charts-umbrella.h
+Examples/BasicExample/Pods/Target Support Files/Charts/Charts.modulemap
+Examples/BasicExample/Pods/Target Support Files/Charts/Charts.xcconfig
+Examples/BasicExample/Pods/Target Support Files/Logging/Logging.xcconfig
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample-acknowledgements.markdown
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample-acknowledgements.plist
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample-dummy.m
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample-frameworks.sh
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample-Info.plist
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample-umbrella.h
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample.debug.xcconfig
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample.modulemap
+Examples/BasicExample/Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample.release.xcconfig
+Examples/BasicExample/Pods/Target Support Files/TensorFlowLiteC/TensorFlowLiteC.xcconfig
+Examples/BasicExample/Pods/Target Support Files/TensorFlowLiteSwift/TensorFlowLiteSwift-dummy.m
+Examples/BasicExample/Pods/Target Support Files/TensorFlowLiteSwift/TensorFlowLiteSwift-Info.plist
+Examples/BasicExample/Pods/Target Support Files/TensorFlowLiteSwift/TensorFlowLiteSwift-prefix.pch
+Examples/BasicExample/Pods/Target Support Files/TensorFlowLiteSwift/TensorFlowLiteSwift-umbrella.h
+Examples/BasicExample/Pods/Target Support Files/TensorFlowLiteSwift/TensorFlowLiteSwift.modulemap
+Examples/BasicExample/Pods/Target Support Files/TensorFlowLiteSwift/TensorFlowLiteSwift.xcconfig
+Examples/BasicExample/Pods/TensorFlowLiteC/Frameworks/TensorFlowLiteC.framework/Headers/c_api.h
+Examples/BasicExample/Pods/TensorFlowLiteC/Frameworks/TensorFlowLiteC.framework/Headers/c_api_types.h
+Examples/BasicExample/Pods/TensorFlowLiteC/Frameworks/TensorFlowLiteC.framework/Headers/TensorFlowLiteC.h
+Examples/BasicExample/Pods/TensorFlowLiteC/Frameworks/TensorFlowLiteC.framework/Modules/module.modulemap
+Examples/BasicExample/Pods/TensorFlowLiteC/Frameworks/TensorFlowLiteC.framework/TensorFlowLiteC
+Examples/BasicExample/Pods/TensorFlowLiteSwift/LICENSE
+Examples/BasicExample/Pods/TensorFlowLiteSwift/README.md
+Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/Interpreter.swift
+Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/InterpreterError.swift
+Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/InterpreterOptions.swift
+Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/Model.swift
+Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/QuantizationParameters.swift
+Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/Tensor.swift
