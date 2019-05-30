@@ -1,0 +1,46 @@
+PODS:
+  - BLECore (3.0.16):
+    - Logging (= 3.0.16)
+  - BoseWearable (3.0.16):
+    - BLECore (= 3.0.16)
+    - Logging (= 3.0.16)
+  - Charts (3.3.0):
+    - Charts/Core (= 3.3.0)
+  - Charts/Core (3.3.0)
+  - Logging (3.0.16)
+  - TensorFlowLiteC (0.2.0)
+  - TensorFlowLiteSwift (0.2.0):
+    - TensorFlowLiteC (= 0.2.0)
+
+DEPENDENCIES:
+  - BLECore (from `../../`)
+  - BoseWearable (from `../../`)
+  - Charts
+  - Logging (from `../../`)
+  - TensorFlowLiteSwift
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - Charts
+    - TensorFlowLiteC
+    - TensorFlowLiteSwift
+
+EXTERNAL SOURCES:
+  BLECore:
+    :path: "../../"
+  BoseWearable:
+    :path: "../../"
+  Logging:
+    :path: "../../"
+
+SPEC CHECKSUMS:
+  BLECore: 6562394f285ed4546974df494416e53e8fd05cb1
+  BoseWearable: 19021aae8a0ecb2a8e5b314159adeccabaa6a6f0
+  Charts: ec1f57f9340054155691e84d4544a1d239d382c5
+  Logging: a7daf64b0eb3c9a68d70cac951ec437a957d7516
+  TensorFlowLiteC: c90ae90f5d8194e3c66518e576f53cf4c1e7f42b
+  TensorFlowLiteSwift: 2499b9629744d0962de7340b53746d1f46f59096
+
+PODFILE CHECKSUM: ee8ca0f38bf3bfabf76287c9c45c4de9340b2184
+
+COCOAPODS: 1.6.1

@@ -1,0 +1,11 @@
+platform :ios, '11.4'
+
+target 'BasicExample' do
+  use_frameworks!
+  
+  pod 'BLECore', :path => '../../'
+  pod 'Logging', :path => '../../'
+  pod 'BoseWearable', :path => '../../'
+  pod 'TensorFlowLiteSwift'
+  pod 'Charts'
+end
