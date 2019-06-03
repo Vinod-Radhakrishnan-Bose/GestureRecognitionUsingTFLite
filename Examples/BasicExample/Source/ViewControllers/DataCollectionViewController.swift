@@ -215,8 +215,8 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             
             // Enable the rotation and accelerometer sensors
             //config.enable(sensor: .rotation, at: ._40ms)
-            config.enable(sensor: .gyroscope, at: ._80ms)
-            config.enable(sensor: .accelerometer, at: ._80ms)
+            config.enable(sensor: .gyroscope, at: ._320ms)
+            config.enable(sensor: .accelerometer, at: ._320ms)
         }
     }
     
@@ -307,17 +307,17 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     
     func Result() {
 
-        var accelBytes : [Float] = []
+        var sensorDataBytes : [Float] = []
         self.active.mainData = []
         for index in 0..<sensor_dimension_ordering.count {
             self.active.mainData += returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
         }
 
         for (_, element) in active.mainData.enumerated() {
-            accelBytes.append(Float(element))
+            sensorDataBytes.append(Float(element))
         }
         // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
-        let result = modelDataHandler?.runModel(input: Data(buffer: UnsafeBufferPointer(start: accelBytes, count: accelBytes.count)))
+        let result = modelDataHandler?.runModel(input: Data(buffer: UnsafeBufferPointer(start: sensorDataBytes, count: sensorDataBytes.count)))
        //Changing the text of the predictionLabel
         predictionLabel.text = result?.inferences[0].label//prediction?.classLabel
         confidenceLabel.text = String(describing : Int16((result?.inferences[0].confidence ?? 0.0) * 100.0)) + "%\n"
@@ -467,7 +467,6 @@ extension DataCollectionViewController: SensorDispatchHandler {
     
     
 func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: SensorTimestamp) {
-    
     var vector_local = vector
     let millisecToSec = 0.001
     if(dataCollectionStaretd)
@@ -487,14 +486,13 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             }
             
             // Normalize accelerometer values
-            if normalization_values_loaded == true {
-                var normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_x")
-                vector_local.x /= normalization_factor
-                normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_y")
-                vector_local.y /= normalization_factor
-                normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_z")
-                vector_local.z /= normalization_factor
-            }
+            var normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_x")
+            vector_local.x /= normalization_factor
+            normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_y")
+            vector_local.y /= normalization_factor
+            normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_z")
+            vector_local.z /= normalization_factor
+            
             if active.prevAccelSensorTimeStamp == 0 &&
                 active.maxAccelSensorTimeStamp == 0 {
                 active.prevAccelSensorTimeStamp = timestamp
@@ -507,7 +505,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             else {
                 timeStampDelta = Int(round(Double(Int(timestamp) - Int(active.prevAccelSensorTimeStamp))/Double(model_sample_period)))
             }
-            if (timeStampDelta > 4) {
+            if (timeStampDelta > 10) {
                 stopDataCollection()
                 startDataCollection()
             }
@@ -548,7 +546,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
         }
     }
     func receivedGyroscope(vector: Vector, accuracy: VectorAccuracy, timestamp: SensorTimestamp)  {
-        
+        var vector_local = vector
         var unwrappedTimeStamp:Int64 = 0
         var timeStampDelta:Int = 0
         let millisecToSec = 0.001
@@ -567,6 +565,13 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
                 GyroData += "\(String(describing: gyroData.rotationRate.y)), "
                 GyroData += "\(String(describing: gyroData.rotationRate.z)) \n"
             }
+
+            var normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_x")
+            vector_local.x /= normalization_factor
+            normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_y")
+            vector_local.y /= normalization_factor
+            normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_z")
+            vector_local.z /= normalization_factor
 
             if active.prevGyroSensorTimeStamp == 0 &&
                 active.maxGyroSensorTimeStamp == 0 {
@@ -592,20 +597,20 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
                     let lastX : Double = active.gyroX.last ?? 0.0
                     let lastY : Double = active.gyroY.last ?? 0.0
                     let lastZ : Double = active.gyroZ.last ?? 0.0
-                    active.gyroX.append(lastX + scale * (vector.x - lastX))
-                    active.gyroY.append(lastY + scale * (vector.y - lastY))
-                    active.gyroZ.append(lastZ + scale * (vector.z - lastZ))
-                    active.interpolatedGyroX.append(lastX + scale * (vector.x - lastX))
-                    active.interpolatedGyroY.append(lastY + scale * (vector.y - lastY))
-                    active.interpolatedGyroZ.append(lastZ + scale * (vector.z - lastZ))
+                    active.gyroX.append(lastX + scale * (vector_local.x - lastX))
+                    active.gyroY.append(lastY + scale * (vector_local.y - lastY))
+                    active.gyroZ.append(lastZ + scale * (vector_local.z - lastZ))
+                    active.interpolatedGyroX.append(lastX + scale * (vector_local.x - lastX))
+                    active.interpolatedGyroY.append(lastY + scale * (vector_local.y - lastY))
+                    active.interpolatedGyroZ.append(lastZ + scale * (vector_local.z - lastZ))
                 }
                 active.prevGyroSensorTimeStamp = timestamp
                 unwrappedTimeStamp = Int64(timestamp) + active.maxGyroSensorTimeStamp
                 active.gyroTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
                 //Buffer stores x, y and z accelerometer data from frames.
-                active.gyroX.append(vector.x)
-                active.gyroY.append(vector.y)
-                active.gyroZ.append(vector.z)
+                active.gyroX.append(vector_local.x)
+                active.gyroY.append(vector_local.y)
+                active.gyroZ.append(vector_local.z)
                 active.interpolatedGyroX.append(0.0)
                 active.interpolatedGyroY.append(0.0)
                 active.interpolatedGyroZ.append(0.0)
@@ -613,7 +618,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
                 active.gyroY = Array(active.gyroY.suffix(240))
                 active.gyroZ = Array(active.gyroZ.suffix(240))
                 active.interpolatedGyroX = active.interpolatedGyroX.suffix(240)
-                active.interpolatedGyroY = active.interpolatedGyroX.suffix(240)
+                active.interpolatedGyroY = active.interpolatedGyroY.suffix(240)
                 active.interpolatedGyroZ = active.interpolatedGyroZ.suffix(240)
                 active.gyroTimeStamp = Array(active.gyroTimeStamp.suffix(240))
                 writeToGyroFile(txt: GyroData)
