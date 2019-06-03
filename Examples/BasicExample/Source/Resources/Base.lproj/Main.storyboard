@@ -250,7 +250,7 @@
                         <viewLayoutGuide key="safeArea" id="mCI-qR-Tzg"/>
                     </view>
                     <connections>
-                        <outlet property="chtChart" destination="3yM-xp-mMT" id="OzK-A8-l1U"/>
+                        <outlet property="accelChart" destination="3yM-xp-mMT" id="OzK-A8-l1U"/>
                         <outlet property="confidenceLabel" destination="q1a-xr-9H3" id="JaV-xd-YfH"/>
                         <outlet property="gyroChart" destination="aO2-RQ-zXx" id="xt8-XM-p6C"/>
                         <outlet property="myTimer" destination="GMm-GR-Hkb" id="8WJ-xq-7QP"/>
