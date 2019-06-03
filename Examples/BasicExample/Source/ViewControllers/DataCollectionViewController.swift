@@ -84,7 +84,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     var sensor_dimension_ordering:[String] = []
     var normalization_value:[Double] = []
     var normalization_values_loaded = false
-    var sample_period:Int = 20
+    var model_sample_period:Int = 20
     
     // Handles all data preprocessing and makes calls to run inference through TfliteWrapper
     private var modelDataHandler: ModelDataHandler?
@@ -137,7 +137,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
                 normalization_value.append(configuration["data_format"]["normalization_value"][index].double!)
             }
             normalization_values_loaded = true
-            sample_period = configuration["data_format"]["sample_period"].int!
+            model_sample_period = configuration["data_format"]["sample_period"].int!
         } catch {
             fatalError("Invalid Sig Def YAML file. Try again.")
         }
@@ -214,8 +214,8 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             
             // Enable the rotation and accelerometer sensors
             //config.enable(sensor: .rotation, at: ._40ms)
-            config.enable(sensor: .gyroscope, at: ._40ms)
-            config.enable(sensor: .accelerometer, at: ._40ms)
+            config.enable(sensor: .gyroscope, at: ._80ms)
+            config.enable(sensor: .accelerometer, at: ._80ms)
         }
     }
     
@@ -458,6 +458,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
 func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: SensorTimestamp) {
     
     var vector_local = vector
+    let millisecToSec = 0.001
     if(dataCollectionStaretd)
         {
             
@@ -490,10 +491,10 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             if timestamp < active.prevAccelSensorTimeStamp {
                 // Handle wraparounds
                 active.maxAccelSensorTimeStamp += Int64(65536)
-                timeStampDelta = Int(round(Double((Int(timestamp) + 65535 - Int(active.prevAccelSensorTimeStamp)))/40.0))
+                timeStampDelta = Int(round(Double(Int(timestamp) + 65535 - Int(active.prevAccelSensorTimeStamp))/Double(model_sample_period)))
             }
             else {
-                timeStampDelta = Int(round(Double((Int(timestamp) - Int(active.prevAccelSensorTimeStamp))/40)))
+                timeStampDelta = Int(round(Double(Int(timestamp) - Int(active.prevAccelSensorTimeStamp))/Double(model_sample_period)))
             }
             if (timeStampDelta > 4) {
                 stopDataCollection()
@@ -502,7 +503,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             else {
                 for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
                     let timeStampBase = active.maxAccelSensorTimeStamp + Int64(active.prevAccelSensorTimeStamp)
-                    active.accelTimeStamp.append(Double(timeStampBase + Int64(index) * 40) * 0.01)
+                    active.accelTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
                     let scale = Double(index)/Double(timeStampDelta)
                     let lastX : Double = active.accelX.last ?? 0.0
                     let lastY : Double = active.accelY.last ?? 0.0
@@ -516,7 +517,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
                 }
                 unwrappedTimeStamp = Int64(timestamp) + active.maxAccelSensorTimeStamp
                 active.prevAccelSensorTimeStamp = timestamp
-                active.accelTimeStamp.append(Double(unwrappedTimeStamp) * 0.01)
+                active.accelTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
                 //Buffer stores x, y and z accelerometer data from frames.
                 active.accelX.append(vector_local.x)
                 active.accelY.append(vector_local.y)
@@ -539,6 +540,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
         
         var unwrappedTimeStamp:Int64 = 0
         var timeStampDelta:Int = 0
+        let millisecToSec = 0.001
         if(dataCollectionStaretd)
         {
             var GyroData:String = ""
@@ -562,10 +564,10 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             if timestamp < active.prevGyroSensorTimeStamp {
                 // Handle wraparounds
                 active.maxGyroSensorTimeStamp += Int64(65536)
-                timeStampDelta = Int(round(Double((Int(timestamp) + 65535 - Int(active.prevGyroSensorTimeStamp)))/40.0))
+                timeStampDelta = Int(round(Double(Int(timestamp) + 65535 - Int(active.prevGyroSensorTimeStamp))/Double(model_sample_period)))
             }
             else {
-                timeStampDelta = Int(round(Double((Int(timestamp) - Int(active.prevGyroSensorTimeStamp))/40)))
+                timeStampDelta = Int(round(Double(Int(timestamp) - Int(active.prevGyroSensorTimeStamp))/Double(model_sample_period)))
             }
             if (timeStampDelta > 4) {
                 stopDataCollection()
@@ -574,7 +576,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             else {
                 for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
                     let timeStampBase = active.maxGyroSensorTimeStamp + Int64(active.prevGyroSensorTimeStamp)
-                    active.gyroTimeStamp.append(Double(timeStampBase + Int64(index) * 40) * 0.01)
+                    active.gyroTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
                     let scale = Double(index)/Double(timeStampDelta)
                     let lastX : Double = active.gyroX.last ?? 0.0
                     let lastY : Double = active.gyroY.last ?? 0.0
@@ -588,7 +590,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
                 }
                 active.prevGyroSensorTimeStamp = timestamp
                 unwrappedTimeStamp = Int64(timestamp) + active.maxGyroSensorTimeStamp
-                active.gyroTimeStamp.append(Double(unwrappedTimeStamp) * 0.01)
+                active.gyroTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
                 //Buffer stores x, y and z accelerometer data from frames.
                 active.gyroX.append(vector.x)
                 active.gyroY.append(vector.y)
@@ -596,13 +598,13 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
                 active.interpolatedGyroX.append(0.0)
                 active.interpolatedGyroY.append(0.0)
                 active.interpolatedGyroZ.append(0.0)
-                active.gyroX = Array(active.gyroX.suffix(360))
-                active.gyroY = Array(active.gyroY.suffix(360))
-                active.gyroZ = Array(active.gyroZ.suffix(360))
-                active.interpolatedGyroX = active.interpolatedGyroX.suffix(360)
-                active.interpolatedGyroY = active.interpolatedGyroX.suffix(360)
-                active.interpolatedGyroZ = active.interpolatedGyroZ.suffix(360)
-                active.gyroTimeStamp = Array(active.gyroTimeStamp.suffix(360))
+                active.gyroX = Array(active.gyroX.suffix(240))
+                active.gyroY = Array(active.gyroY.suffix(240))
+                active.gyroZ = Array(active.gyroZ.suffix(240))
+                active.interpolatedGyroX = active.interpolatedGyroX.suffix(240)
+                active.interpolatedGyroY = active.interpolatedGyroX.suffix(240)
+                active.interpolatedGyroZ = active.interpolatedGyroZ.suffix(240)
+                active.gyroTimeStamp = Array(active.gyroTimeStamp.suffix(240))
                 writeToGyroFile(txt: GyroData)
             }
         }
