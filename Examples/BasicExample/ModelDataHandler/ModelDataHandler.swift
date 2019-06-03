@@ -23,15 +23,6 @@ struct Inference {
 /// Information about a model file or labels file.
 typealias FileInfo = (name: String, extension: String)
 
-/// Information about the MobileNet model.
-enum MobileNet {
-    //static let modelInfo: FileInfo = (name: "TFKerasModel_to_TFlite", extension: "tflite")
-    //static let labelsInfo: FileInfo = (name: "labels", extension: "txt")
-    static let modelInfo: FileInfo = (name: "TFKerasModel_to_TFlite", extension: "tflite")
-    static let labelsInfo: FileInfo = (name: "labels", extension: "txt")
-
-}
-
 /// This class handles all data preprocessing and makes calls to run inference on a given frame
 /// by invoking the `Interpreter`. It then formats the inferences obtained and returns the top N
 /// results for a successful inference.

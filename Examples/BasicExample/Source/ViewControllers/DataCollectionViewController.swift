@@ -113,7 +113,8 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         motionManager.startGyroUpdates()
         motionManager.startMagnetometerUpdates()
 
-        guard let fileURL = Bundle.main.url(forResource: "sig_def", withExtension: "yml") else {
+        //guard let fileURL = Bundle.main.url(forResource: "model_config_activity_recognition", withExtension: "yml") else {
+        guard let fileURL = Bundle.main.url(forResource: "model_config_look_up_look_left", withExtension: "yml") else {
             fatalError("Sig Def YAML file not found in bundle. Please add and try again.")
         }
         do {
@@ -331,6 +332,12 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             array = self.active.accelY
         case "accel_z":
             array = self.active.accelZ
+        case "gyro_x":
+            array = self.active.gyroX
+        case "gyro_y":
+            array = self.active.gyroY
+        case "gyro_z":
+            array = self.active.gyroZ
         default:
             array = self.active.accelX
         }
@@ -339,7 +346,11 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
 
     func returnSensorDimensionNormalizationValue(name:String)->Double {
         let index = sensor_dimension_ordering.lastIndex(of: name)
-        return normalization_value[index!]
+        if index != nil {
+            return normalization_value[index!]
+        } else {
+            return 1.0
+        }
     }
     
     @IBAction func emailData(_ sender: Any) {
@@ -569,7 +580,7 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             else {
                 timeStampDelta = Int(round(Double(Int(timestamp) - Int(active.prevGyroSensorTimeStamp))/Double(model_sample_period)))
             }
-            if (timeStampDelta > 4) {
+            if (timeStampDelta > 10) {
                 stopDataCollection()
                 startDataCollection()
             }

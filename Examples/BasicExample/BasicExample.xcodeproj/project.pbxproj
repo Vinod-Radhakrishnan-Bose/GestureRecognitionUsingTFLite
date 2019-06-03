@@ -7,7 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2466ABD022A53B290060019E /* sig_def.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABCF22A53B290060019E /* sig_def.yml */; };
+		2466ABD022A53B290060019E /* model_config_activity_recognition.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABCF22A53B290060019E /* model_config_activity_recognition.yml */; };
+		2466ABD222A586E70060019E /* model_config_look_up_look_left.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABD122A586E70060019E /* model_config_look_up_look_left.yml */; };
 		248BBE7B22A03FED003856C5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 248BBE7922A03FED003856C5 /* Main.storyboard */; };
 		24B7D30A229EB1EE00BC36B0 /* ActivityData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D309229EB1DA00BC36B0 /* ActivityData.swift */; };
 		24B7D30E229EB3F100BC36B0 /* DataCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D30D229EB3F100BC36B0 /* DataCollectionViewController.swift */; };
@@ -42,7 +43,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2466ABCF22A53B290060019E /* sig_def.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = sig_def.yml; sourceTree = "<group>"; };
+		2466ABCF22A53B290060019E /* model_config_activity_recognition.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = model_config_activity_recognition.yml; sourceTree = "<group>"; };
+		2466ABD122A586E70060019E /* model_config_look_up_look_left.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = model_config_look_up_look_left.yml; sourceTree = "<group>"; };
 		248BBE7A22A03FED003856C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		24B7D309229EB1DA00BC36B0 /* ActivityData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityData.swift; sourceTree = "<group>"; };
 		24B7D30D229EB3F100BC36B0 /* DataCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataCollectionViewController.swift; sourceTree = "<group>"; };
@@ -90,7 +92,8 @@
 		24B7D315229EB7BD00BC36B0 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				2466ABCF22A53B290060019E /* sig_def.yml */,
+				2466ABCF22A53B290060019E /* model_config_activity_recognition.yml */,
+				2466ABD122A586E70060019E /* model_config_look_up_look_left.yml */,
 				24B7D316229EB7BD00BC36B0 /* TFKerasModel_to_TFlite.tflite */,
 				24B7D31B229EC12200BC36B0 /* look_left_look_up.txt */,
 				24B7D31C229EC12200BC36B0 /* TFKerasModel_to_TFlite_look_left_look_up.tflite */,
@@ -264,10 +267,11 @@
 				24B7D319229EB7BD00BC36B0 /* TFKerasModel_to_TFlite.tflite in Resources */,
 				24B7D31D229EC12200BC36B0 /* look_left_look_up.txt in Resources */,
 				24B7D31A229EB7BD00BC36B0 /* labels.txt in Resources */,
-				2466ABD022A53B290060019E /* sig_def.yml in Resources */,
+				2466ABD022A53B290060019E /* model_config_activity_recognition.yml in Resources */,
 				C568AC5B21AC6E2F00FFE42E /* Assets.xcassets in Resources */,
 				C568AC5C21AC6E2F00FFE42E /* LaunchScreen.storyboard in Resources */,
 				24B7D31E229EC12200BC36B0 /* TFKerasModel_to_TFlite_look_left_look_up.tflite in Resources */,
+				2466ABD222A586E70060019E /* model_config_look_up_look_left.yml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
