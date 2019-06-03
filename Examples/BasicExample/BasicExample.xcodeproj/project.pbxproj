@@ -95,9 +95,9 @@
 				2466ABCF22A53B290060019E /* model_config_activity_recognition.yml */,
 				2466ABD122A586E70060019E /* model_config_look_up_look_left.yml */,
 				24B7D316229EB7BD00BC36B0 /* TFKerasModel_to_TFlite_activity_recognition.tflite */,
-				24B7D31B229EC12200BC36B0 /* look_left_look_up.txt */,
 				24B7D31C229EC12200BC36B0 /* TFKerasModel_to_TFlite_look_left_look_up.tflite */,
 				24B7D317229EB7BD00BC36B0 /* labels_activity_recognition.txt */,
+				24B7D31B229EC12200BC36B0 /* look_left_look_up.txt */,
 			);
 			path = Model;
 			sourceTree = "<group>";

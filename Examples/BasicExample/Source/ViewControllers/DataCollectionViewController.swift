@@ -215,8 +215,8 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             
             // Enable the rotation and accelerometer sensors
             //config.enable(sensor: .rotation, at: ._40ms)
-            config.enable(sensor: .gyroscope, at: ._320ms)
-            config.enable(sensor: .accelerometer, at: ._320ms)
+            config.enable(sensor: .gyroscope, at: ._40ms)
+            config.enable(sensor: .accelerometer, at: ._40ms)
         }
     }
     
@@ -327,19 +327,19 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         var array:[Double]=[]
         switch name {
         case "accel_x":
-            array = self.active.accelX
+            array = self.active.accel.dataX
         case "accel_y":
-            array = self.active.accelY
+            array = self.active.accel.dataY
         case "accel_z":
-            array = self.active.accelZ
+            array = self.active.accel.dataZ
         case "gyro_x":
-            array = self.active.gyroX
+            array = self.active.gyro.dataX
         case "gyro_y":
-            array = self.active.gyroY
+            array = self.active.gyro.dataY
         case "gyro_z":
-            array = self.active.gyroZ
+            array = self.active.gyro.dataZ
         default:
-            array = self.active.accelX
+            array = self.active.accel.dataX
         }
         return array
     }
@@ -493,17 +493,17 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_z")
             vector_local.z /= normalization_factor
             
-            if active.prevAccelSensorTimeStamp == 0 &&
-                active.maxAccelSensorTimeStamp == 0 {
-                active.prevAccelSensorTimeStamp = timestamp
+            if active.accel.prevDataTimeStamp == 0 &&
+                active.accel.maxDataTimeStamp == 0 {
+                active.accel.prevDataTimeStamp = timestamp
             }
-            if timestamp < active.prevAccelSensorTimeStamp {
+            if timestamp < active.accel.prevDataTimeStamp {
                 // Handle wraparounds
-                active.maxAccelSensorTimeStamp += Int64(65536)
-                timeStampDelta = Int(round(Double(Int(timestamp) + 65535 - Int(active.prevAccelSensorTimeStamp))/Double(model_sample_period)))
+                active.accel.maxDataTimeStamp += Int64(65536)
+                timeStampDelta = Int(round(Double(Int(timestamp) + 65535 - Int(active.accel.prevDataTimeStamp))/Double(model_sample_period)))
             }
             else {
-                timeStampDelta = Int(round(Double(Int(timestamp) - Int(active.prevAccelSensorTimeStamp))/Double(model_sample_period)))
+                timeStampDelta = Int(round(Double(Int(timestamp) - Int(active.accel.prevDataTimeStamp))/Double(model_sample_period)))
             }
             if (timeStampDelta > 10) {
                 stopDataCollection()
@@ -511,36 +511,36 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             }
             else {
                 for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
-                    let timeStampBase = active.maxAccelSensorTimeStamp + Int64(active.prevAccelSensorTimeStamp)
-                    active.accelTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
+                    let timeStampBase = active.accel.maxDataTimeStamp + Int64(active.accel.prevDataTimeStamp)
+                    active.accel.dataTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
                     let scale = Double(index)/Double(timeStampDelta)
-                    let lastX : Double = active.accelX.last ?? 0.0
-                    let lastY : Double = active.accelY.last ?? 0.0
-                    let lastZ : Double = active.accelZ.last ?? 0.0
-                    active.accelX.append(lastX + scale * (vector_local.x - lastX))
-                    active.accelY.append(lastY + scale * (vector_local.y - lastY))
-                    active.accelZ.append(lastZ + scale * (vector_local.z - lastZ))
-                    active.interpolatedAccelX.append(lastX + scale * (vector_local.x - lastX))
-                    active.interpolatedAccelY.append(lastY + scale * (vector_local.y - lastY))
-                    active.interpolatedAccelZ.append(lastZ + scale * (vector_local.z - lastZ))
+                    let lastX : Double = active.accel.dataX.last ?? 0.0
+                    let lastY : Double = active.accel.dataY.last ?? 0.0
+                    let lastZ : Double = active.accel.dataZ.last ?? 0.0
+                    active.accel.dataX.append(lastX + scale * (vector_local.x - lastX))
+                    active.accel.dataY.append(lastY + scale * (vector_local.y - lastY))
+                    active.accel.dataZ.append(lastZ + scale * (vector_local.z - lastZ))
+                    active.accel.interpolatedDataX.append(lastX + scale * (vector_local.x - lastX))
+                    active.accel.interpolatedDataY.append(lastY + scale * (vector_local.y - lastY))
+                    active.accel.interpolatedDataZ.append(lastZ + scale * (vector_local.z - lastZ))
                 }
-                unwrappedTimeStamp = Int64(timestamp) + active.maxAccelSensorTimeStamp
-                active.prevAccelSensorTimeStamp = timestamp
-                active.accelTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
+                unwrappedTimeStamp = Int64(timestamp) + active.accel.maxDataTimeStamp
+                active.accel.prevDataTimeStamp = timestamp
+                active.accel.dataTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
                 //Buffer stores x, y and z accelerometer data from frames.
-                active.accelX.append(vector_local.x)
-                active.accelY.append(vector_local.y)
-                active.accelZ.append(vector_local.z)
-                active.interpolatedAccelX.append(0.0)
-                active.interpolatedAccelY.append(0.0)
-                active.interpolatedAccelZ.append(0.0)
-                active.accelX = active.accelX.suffix(240)
-                active.accelY = active.accelY.suffix(240)
-                active.accelZ = active.accelZ.suffix(240)
-                active.accelTimeStamp = active.accelTimeStamp.suffix(240)
-                active.interpolatedAccelX = active.interpolatedAccelX.suffix(240)
-                active.interpolatedAccelY = active.interpolatedAccelY.suffix(240)
-                active.interpolatedAccelZ = active.interpolatedAccelZ.suffix(240)
+                active.accel.dataX.append(vector_local.x)
+                active.accel.dataY.append(vector_local.y)
+                active.accel.dataZ.append(vector_local.z)
+                active.accel.interpolatedDataX.append(0.0)
+                active.accel.interpolatedDataY.append(0.0)
+                active.accel.interpolatedDataZ.append(0.0)
+                active.accel.dataX = active.accel.dataX.suffix(240)
+                active.accel.dataY = active.accel.dataY.suffix(240)
+                active.accel.dataZ = active.accel.dataZ.suffix(240)
+                active.accel.dataTimeStamp = active.accel.dataTimeStamp.suffix(240)
+                active.accel.interpolatedDataX = active.accel.interpolatedDataX.suffix(240)
+                active.accel.interpolatedDataY = active.accel.interpolatedDataY.suffix(240)
+                active.accel.interpolatedDataZ = active.accel.interpolatedDataZ.suffix(240)
                 writeToAccelFile(txt: AccelData)
             }
         }
@@ -573,17 +573,17 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_z")
             vector_local.z /= normalization_factor
 
-            if active.prevGyroSensorTimeStamp == 0 &&
-                active.maxGyroSensorTimeStamp == 0 {
-                active.prevGyroSensorTimeStamp = timestamp
+            if active.gyro.prevDataTimeStamp == 0 &&
+                active.gyro.maxDataTimeStamp == 0 {
+                active.gyro.prevDataTimeStamp = timestamp
             }
-            if timestamp < active.prevGyroSensorTimeStamp {
+            if timestamp < active.gyro.prevDataTimeStamp {
                 // Handle wraparounds
-                active.maxGyroSensorTimeStamp += Int64(65536)
-                timeStampDelta = Int(round(Double(Int(timestamp) + 65535 - Int(active.prevGyroSensorTimeStamp))/Double(model_sample_period)))
+                active.gyro.maxDataTimeStamp += Int64(65536)
+                timeStampDelta = Int(round(Double(Int(timestamp) + 65535 - Int(active.gyro.prevDataTimeStamp))/Double(model_sample_period)))
             }
             else {
-                timeStampDelta = Int(round(Double(Int(timestamp) - Int(active.prevGyroSensorTimeStamp))/Double(model_sample_period)))
+                timeStampDelta = Int(round(Double(Int(timestamp) - Int(active.gyro.prevDataTimeStamp))/Double(model_sample_period)))
             }
             if (timeStampDelta > 10) {
                 stopDataCollection()
@@ -591,36 +591,36 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
             }
             else {
                 for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
-                    let timeStampBase = active.maxGyroSensorTimeStamp + Int64(active.prevGyroSensorTimeStamp)
-                    active.gyroTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
+                    let timeStampBase = active.gyro.maxDataTimeStamp + Int64(active.gyro.prevDataTimeStamp)
+                    active.gyro.dataTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
                     let scale = Double(index)/Double(timeStampDelta)
-                    let lastX : Double = active.gyroX.last ?? 0.0
-                    let lastY : Double = active.gyroY.last ?? 0.0
-                    let lastZ : Double = active.gyroZ.last ?? 0.0
-                    active.gyroX.append(lastX + scale * (vector_local.x - lastX))
-                    active.gyroY.append(lastY + scale * (vector_local.y - lastY))
-                    active.gyroZ.append(lastZ + scale * (vector_local.z - lastZ))
-                    active.interpolatedGyroX.append(lastX + scale * (vector_local.x - lastX))
-                    active.interpolatedGyroY.append(lastY + scale * (vector_local.y - lastY))
-                    active.interpolatedGyroZ.append(lastZ + scale * (vector_local.z - lastZ))
+                    let lastX : Double = active.gyro.dataX.last ?? 0.0
+                    let lastY : Double = active.gyro.dataY.last ?? 0.0
+                    let lastZ : Double = active.gyro.dataZ.last ?? 0.0
+                    active.gyro.dataX.append(lastX + scale * (vector_local.x - lastX))
+                    active.gyro.dataY.append(lastY + scale * (vector_local.y - lastY))
+                    active.gyro.dataZ.append(lastZ + scale * (vector_local.z - lastZ))
+                    active.gyro.interpolatedDataX.append(lastX + scale * (vector_local.x - lastX))
+                    active.gyro.interpolatedDataY.append(lastY + scale * (vector_local.y - lastY))
+                    active.gyro.interpolatedDataZ.append(lastZ + scale * (vector_local.z - lastZ))
                 }
-                active.prevGyroSensorTimeStamp = timestamp
-                unwrappedTimeStamp = Int64(timestamp) + active.maxGyroSensorTimeStamp
-                active.gyroTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
+                active.gyro.prevDataTimeStamp = timestamp
+                unwrappedTimeStamp = Int64(timestamp) + active.gyro.maxDataTimeStamp
+                active.gyro.dataTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
                 //Buffer stores x, y and z accelerometer data from frames.
-                active.gyroX.append(vector_local.x)
-                active.gyroY.append(vector_local.y)
-                active.gyroZ.append(vector_local.z)
-                active.interpolatedGyroX.append(0.0)
-                active.interpolatedGyroY.append(0.0)
-                active.interpolatedGyroZ.append(0.0)
-                active.gyroX = Array(active.gyroX.suffix(240))
-                active.gyroY = Array(active.gyroY.suffix(240))
-                active.gyroZ = Array(active.gyroZ.suffix(240))
-                active.interpolatedGyroX = active.interpolatedGyroX.suffix(240)
-                active.interpolatedGyroY = active.interpolatedGyroY.suffix(240)
-                active.interpolatedGyroZ = active.interpolatedGyroZ.suffix(240)
-                active.gyroTimeStamp = Array(active.gyroTimeStamp.suffix(240))
+                active.gyro.dataX.append(vector_local.x)
+                active.gyro.dataY.append(vector_local.y)
+                active.gyro.dataZ.append(vector_local.z)
+                active.gyro.interpolatedDataX.append(0.0)
+                active.gyro.interpolatedDataY.append(0.0)
+                active.gyro.interpolatedDataZ.append(0.0)
+                active.gyro.dataX = Array(active.gyro.dataX.suffix(240))
+                active.gyro.dataY = Array(active.gyro.dataY.suffix(240))
+                active.gyro.dataZ = Array(active.gyro.dataZ.suffix(240))
+                active.gyro.interpolatedDataX = active.gyro.interpolatedDataX.suffix(240)
+                active.gyro.interpolatedDataY = active.gyro.interpolatedDataY.suffix(240)
+                active.gyro.interpolatedDataZ = active.gyro.interpolatedDataZ.suffix(240)
+                active.gyro.dataTimeStamp = Array(active.gyro.dataTimeStamp.suffix(240))
                 writeToGyroFile(txt: GyroData)
             }
         }
@@ -763,18 +763,18 @@ extension DataCollectionViewController: WearableDeviceSessionDelegate {
         gyroChart.chartDescription?.text = "Gyroscope"
         let Acceldata = LineChartData() //This is the object that will be added to the chart
         let Gyrodata = LineChartData() //This is the object that will be added to the chart
-        let line1 : LineChartDataSet = addCurve(curveName : active.accelX, timestamps : active.accelTimeStamp, label : "accelX", color : NSUIColor.blue)
-        let line2 : LineChartDataSet = addCurve(curveName : active.accelY, timestamps : active.accelTimeStamp, label : "accelY", color : NSUIColor.red)
-        let line3 : LineChartDataSet = addCurve(curveName : active.accelZ, timestamps : active.accelTimeStamp, label : "accelZ", color : NSUIColor.green)
-        let line4 : LineChartDataSet = addCurve(curveName : active.gyroX, timestamps : active.gyroTimeStamp, label : "gyroX", color : NSUIColor.blue)
-        let line5 : LineChartDataSet = addCurve(curveName : active.gyroY, timestamps : active.gyroTimeStamp, label : "gyroY", color : NSUIColor.red)
-        let line6 : LineChartDataSet = addCurve(curveName : active.gyroZ, timestamps : active.gyroTimeStamp, label : "gyroZ", color : NSUIColor.green)
-        let line7 : LineChartDataSet = addCurve(curveName : active.interpolatedAccelX, timestamps : active.accelTimeStamp, label : "interpolatedAccelX", color : NSUIColor.black)
-        let line8 : LineChartDataSet = addCurve(curveName : active.interpolatedAccelY, timestamps : active.accelTimeStamp, label : "interpolatedAccelY", color : NSUIColor.cyan)
-        let line9 : LineChartDataSet = addCurve(curveName : active.interpolatedAccelZ, timestamps : active.accelTimeStamp, label : "interpolatedAccelZ", color : NSUIColor.yellow)
-        let line10 : LineChartDataSet = addCurve(curveName : active.interpolatedGyroX, timestamps : active.gyroTimeStamp, label : "interpolatedGyroX", color : NSUIColor.black)
-        let line11 : LineChartDataSet = addCurve(curveName : active.interpolatedGyroY, timestamps : active.gyroTimeStamp, label : "interpolatedGyroY", color : NSUIColor.cyan)
-        let line12 : LineChartDataSet = addCurve(curveName : active.interpolatedGyroZ, timestamps : active.gyroTimeStamp, label : "interpolatedGyroZ", color : NSUIColor.yellow)
+        let line1 : LineChartDataSet = addCurve(curveName : active.accel.dataX, timestamps : active.accel.dataTimeStamp, label : "accelX", color : NSUIColor.blue)
+        let line2 : LineChartDataSet = addCurve(curveName : active.accel.dataY, timestamps : active.accel.dataTimeStamp, label : "accelY", color : NSUIColor.red)
+        let line3 : LineChartDataSet = addCurve(curveName : active.accel.dataZ, timestamps : active.accel.dataTimeStamp, label : "accelZ", color : NSUIColor.green)
+        let line4 : LineChartDataSet = addCurve(curveName : active.gyro.dataX, timestamps : active.gyro.dataTimeStamp, label : "gyroX", color : NSUIColor.blue)
+        let line5 : LineChartDataSet = addCurve(curveName : active.gyro.dataY, timestamps : active.gyro.dataTimeStamp, label : "gyroY", color : NSUIColor.red)
+        let line6 : LineChartDataSet = addCurve(curveName : active.gyro.dataZ, timestamps : active.gyro.dataTimeStamp, label : "gyroZ", color : NSUIColor.green)
+        let line7 : LineChartDataSet = addCurve(curveName : active.accel.interpolatedDataX, timestamps : active.accel.dataTimeStamp, label : "interpolatedAccelX", color : NSUIColor.black)
+        let line8 : LineChartDataSet = addCurve(curveName : active.accel.interpolatedDataY, timestamps : active.accel.dataTimeStamp, label : "interpolatedAccelY", color : NSUIColor.cyan)
+        let line9 : LineChartDataSet = addCurve(curveName : active.accel.interpolatedDataZ, timestamps : active.accel.dataTimeStamp, label : "interpolatedAccelZ", color : NSUIColor.yellow)
+        let line10 : LineChartDataSet = addCurve(curveName : active.gyro.interpolatedDataX, timestamps : active.gyro.dataTimeStamp, label : "interpolatedGyroX", color : NSUIColor.black)
+        let line11 : LineChartDataSet = addCurve(curveName : active.gyro.interpolatedDataY, timestamps : active.gyro.dataTimeStamp, label : "interpolatedGyroY", color : NSUIColor.cyan)
+        let line12 : LineChartDataSet = addCurve(curveName : active.gyro.interpolatedDataZ, timestamps : active.gyro.dataTimeStamp, label : "interpolatedGyroZ", color : NSUIColor.yellow)
 
 
         Acceldata.addDataSet(line1) //Adds the line to the dataSet
@@ -813,24 +813,24 @@ extension DataCollectionViewController: WearableDeviceSessionDelegate {
     }
     
     func flushDataBuffers() {
-        self.active.accelX.removeAll()
-        self.active.accelY.removeAll()
-        self.active.accelZ.removeAll()
-        self.active.accelTimeStamp.removeAll()
-        self.active.gyroX.removeAll()
-        self.active.gyroY.removeAll()
-        self.active.gyroZ.removeAll()
-        self.active.gyroTimeStamp.removeAll()
-        self.active.prevAccelSensorTimeStamp = 0
-        self.active.prevGyroSensorTimeStamp = 0
-        self.active.maxAccelSensorTimeStamp = 0
-        self.active.maxGyroSensorTimeStamp = 0
-        self.active.interpolatedAccelX.removeAll()
-        self.active.interpolatedAccelY.removeAll()
-        self.active.interpolatedAccelZ.removeAll()
-        self.active.interpolatedGyroX.removeAll()
-        self.active.interpolatedGyroY.removeAll()
-        self.active.interpolatedGyroZ.removeAll()
+        self.active.accel.dataX.removeAll()
+        self.active.accel.dataY.removeAll()
+        self.active.accel.dataZ.removeAll()
+        self.active.accel.dataTimeStamp.removeAll()
+        self.active.gyro.dataX.removeAll()
+        self.active.gyro.dataY.removeAll()
+        self.active.gyro.dataZ.removeAll()
+        self.active.gyro.dataTimeStamp.removeAll()
+        self.active.accel.prevDataTimeStamp = 0
+        self.active.gyro.prevDataTimeStamp = 0
+        self.active.accel.maxDataTimeStamp = 0
+        self.active.gyro.maxDataTimeStamp = 0
+        self.active.accel.interpolatedDataX.removeAll()
+        self.active.accel.interpolatedDataY.removeAll()
+        self.active.accel.interpolatedDataZ.removeAll()
+        self.active.gyro.interpolatedDataX.removeAll()
+        self.active.gyro.interpolatedDataY.removeAll()
+        self.active.gyro.interpolatedDataZ.removeAll()
     }
     
     func stopDataCollection() {
