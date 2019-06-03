@@ -188,3 +188,18 @@ Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swif
 Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/Model.swift
 Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/QuantizationParameters.swift
 Examples/BasicExample/Pods/TensorFlowLiteSwift/tensorflow/lite/experimental/swift/Sources/Tensor.swift
+Examples/BasicExample/Pods/Pods.xcodeproj/xcuserdata/vr71377.xcuserdatad/xcschemes/Yaml.xcscheme
+Examples/BasicExample/Pods/Target Support Files/Yaml/Yaml-dummy.m
+Examples/BasicExample/Pods/Target Support Files/Yaml/Yaml-Info.plist
+Examples/BasicExample/Pods/Target Support Files/Yaml/Yaml-prefix.pch
+Examples/BasicExample/Pods/Target Support Files/Yaml/Yaml-umbrella.h
+Examples/BasicExample/Pods/Target Support Files/Yaml/Yaml.modulemap
+Examples/BasicExample/Pods/Target Support Files/Yaml/Yaml.xcconfig
+Examples/BasicExample/Pods/Yaml/LICENSE
+Examples/BasicExample/Pods/Yaml/Readme.md
+Examples/BasicExample/Pods/Yaml/Sources/Yaml/Yaml.swift
+Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLOperators.swift
+Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLParser.swift
+Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLRegex.swift
+Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLResult.swift
+Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLTokenizer.swift

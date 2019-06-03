@@ -38,7 +38,7 @@ enum MobileNet {
 class ModelDataHandler {
     
     // MARK: - Public Properties
-    let resultCount = 1
+    var resultCount = 1
     
     // MARK: - Private Properties
     
@@ -50,7 +50,7 @@ class ModelDataHandler {
 
     /// A failable initializer for `ModelDataHandler`. A new instance is created if the model and
     /// labels files are successfully loaded from the app's main bundle. Default `threadCount` is 1.
-    init?(modelFileInfo: FileInfo, labelsFileInfo: FileInfo, threadCount: Int = 1) {
+    init?(modelFileInfo: FileInfo, labelsFileInfo: FileInfo, threadCount: Int = 1, configuredResultCount: Int = 3) {
         let modelFilename = modelFileInfo.name
         
         // Construct the path to the model file.
@@ -74,6 +74,8 @@ class ModelDataHandler {
         }
         // Load the classes listed in the labels file.
         loadLabels(fileInfo: labelsFileInfo)
+        
+        resultCount = configuredResultCount
     }
     /// Loads the labels from the labels file and stores them in the `labels` property.
     private func loadLabels(fileInfo: FileInfo) {

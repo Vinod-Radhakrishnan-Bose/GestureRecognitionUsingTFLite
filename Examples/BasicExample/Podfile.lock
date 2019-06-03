@@ -11,6 +11,7 @@ PODS:
   - TensorFlowLiteC (0.2.0)
   - TensorFlowLiteSwift (0.2.0):
     - TensorFlowLiteC (= 0.2.0)
+  - Yaml (3.4.4)
 
 DEPENDENCIES:
   - BLECore (from `../../`)
@@ -18,12 +19,14 @@ DEPENDENCIES:
   - Charts
   - Logging (from `../../`)
   - TensorFlowLiteSwift
+  - Yaml
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Charts
     - TensorFlowLiteC
     - TensorFlowLiteSwift
+    - Yaml
 
 EXTERNAL SOURCES:
   BLECore:
@@ -40,7 +43,8 @@ SPEC CHECKSUMS:
   Logging: a7daf64b0eb3c9a68d70cac951ec437a957d7516
   TensorFlowLiteC: c90ae90f5d8194e3c66518e576f53cf4c1e7f42b
   TensorFlowLiteSwift: 2499b9629744d0962de7340b53746d1f46f59096
+  Yaml: 52831fc1d9ac2db4ddf6d7562993457127256ca6
 
-PODFILE CHECKSUM: ee8ca0f38bf3bfabf76287c9c45c4de9340b2184
+PODFILE CHECKSUM: 7c387ba8465df753d89d6d435819ca828fc1861a
 
 COCOAPODS: 1.6.1

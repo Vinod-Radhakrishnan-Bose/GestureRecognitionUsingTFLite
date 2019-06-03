@@ -8,4 +8,5 @@ target 'BasicExample' do
   pod 'BoseWearable', :path => '../../'
   pod 'TensorFlowLiteSwift'
   pod 'Charts'
+  pod 'Yaml'
 end

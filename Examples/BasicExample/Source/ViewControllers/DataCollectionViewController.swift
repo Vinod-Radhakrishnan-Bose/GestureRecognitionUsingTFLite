@@ -14,6 +14,7 @@ import Accelerate
 import TensorFlowLite
 import CoreImage
 import Charts
+import Yaml
 
 class DataCollectionViewController: UIViewController, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate {
     
@@ -42,13 +43,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     
     @IBOutlet weak var predictionLabel: UILabel!
     @IBOutlet weak var confidenceLabel: UILabel!
-    
-    //Calls the coremlmodel file
-    //let model = HAR_Frames()
-    
-    //mlMultiArray is initialized with shape (1,240) and datatype double. This is used for predictions.
-    var mlMultiArrayInput = try? MLMultiArray(shape:[240], dataType:MLMultiArrayDataType.double)
-  
+        
     @IBOutlet weak var startStopButton: UIButton!
     var fileNameAccel = ""
     var fileURLAccel:URL? = nil
@@ -85,9 +80,14 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
 
     let motionManager = CMMotionManager()
     
+    var num_values_per_sensor_dimenion = 100
+    var sensor_dimension_ordering:[String] = []
+    var normalization_value:[Double] = []
+    var normalization_values_loaded = false
+    var sample_period:Int = 20
+    
     // Handles all data preprocessing and makes calls to run inference through TfliteWrapper
-    private var modelDataHandler: ModelDataHandler? =
-        ModelDataHandler(modelFileInfo: MobileNet.modelInfo, labelsFileInfo: MobileNet.labelsInfo)
+    private var modelDataHandler: ModelDataHandler?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,10 +113,34 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         motionManager.startGyroUpdates()
         motionManager.startMagnetometerUpdates()
 
-        guard modelDataHandler != nil else {
-            fatalError("Model set up failed")
+        guard let fileURL = Bundle.main.url(forResource: "sig_def", withExtension: "yml") else {
+            fatalError("Sig Def YAML file not found in bundle. Please add and try again.")
         }
-
+        do {
+            let contents = try String(contentsOf: fileURL, encoding: .utf8)
+            let configuration = try! Yaml.load(contents)
+            //print(configuration)
+            print(configuration["num_results"])
+            let num_results = configuration["num_results"].int!
+            let modelInfo:FileInfo = (name:configuration["model_filename"].string!, extension:"")
+            let labelInfo:FileInfo = (name:configuration["labels_filename"].string!, extension:"")
+            modelDataHandler =
+                ModelDataHandler(modelFileInfo: modelInfo, labelsFileInfo: labelInfo ,
+                                 configuredResultCount: num_results)
+            guard modelDataHandler != nil else {
+                fatalError("Model set up failed")
+            }
+            num_values_per_sensor_dimenion = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
+            for index in 0..<configuration["data_format"]["sensor_dimension_ordering"].count! {
+                let sensor_dim = configuration["data_format"]["sensor_dimension_ordering"][index].string!
+                sensor_dimension_ordering.append(sensor_dim)
+                normalization_value.append(configuration["data_format"]["normalization_value"][index].double!)
+            }
+            normalization_values_loaded = true
+            sample_period = configuration["data_format"]["sample_period"].int!
+        } catch {
+            fatalError("Invalid Sig Def YAML file. Try again.")
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -283,10 +307,12 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     func Result() {
 
         var accelBytes : [Float] = []
-        self.active.mainData = (self.active.accelX.suffix(80) + self.active.accelY.suffix(80) + self.active.accelZ.suffix(80))
-        //active.mainData = (active.gyroX.suffix(120) + active.gyroZ.suffix(120))// + self.active.accelZ)
+        self.active.mainData = []
+        for index in 0..<sensor_dimension_ordering.count {
+            self.active.mainData += returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
+        }
 
-        for (index, element) in active.mainData.enumerated() { mlMultiArrayInput![index] = NSNumber(floatLiteral: element)
+        for (_, element) in active.mainData.enumerated() {
             accelBytes.append(Float(element))
         }
         // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
@@ -295,7 +321,27 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         predictionLabel.text = result?.inferences[0].label//prediction?.classLabel
         confidenceLabel.text = String(describing : Int16((result?.inferences[0].confidence ?? 0.0) * 100.0)) + "%\n"
     }
+    
+    func returnSensorDimension(name:String)->[Double] {
+        var array:[Double]=[]
+        switch name {
+        case "accel_x":
+            array = self.active.accelX
+        case "accel_y":
+            array = self.active.accelY
+        case "accel_z":
+            array = self.active.accelZ
+        default:
+            array = self.active.accelX
+        }
+        return array
+    }
 
+    func returnSensorDimensionNormalizationValue(name:String)->Double {
+        let index = sensor_dimension_ordering.lastIndex(of: name)
+        return normalization_value[index!]
+    }
+    
     @IBAction func emailData(_ sender: Any) {
         
         if( MFMailComposeViewController.canSendMail() ) {
@@ -411,6 +457,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
     
 func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: SensorTimestamp) {
     
+    var vector_local = vector
     if(dataCollectionStaretd)
         {
             
@@ -427,6 +474,15 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
                 AccelData += "\(String(describing: accelerometerData.acceleration.z)) \n"
             }
             
+            // Normalize accelerometer values
+            if normalization_values_loaded == true {
+                var normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_x")
+                vector_local.x /= normalization_factor
+                normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_y")
+                vector_local.y /= normalization_factor
+                normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_z")
+                vector_local.z /= normalization_factor
+            }
             if active.prevAccelSensorTimeStamp == 0 &&
                 active.maxAccelSensorTimeStamp == 0 {
                 active.prevAccelSensorTimeStamp = timestamp
@@ -451,20 +507,20 @@ func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: 
                     let lastX : Double = active.accelX.last ?? 0.0
                     let lastY : Double = active.accelY.last ?? 0.0
                     let lastZ : Double = active.accelZ.last ?? 0.0
-                    active.accelX.append(lastX + scale * (vector.x - lastX))
-                    active.accelY.append(lastY + scale * (vector.y - lastY))
-                    active.accelZ.append(lastZ + scale * (vector.z - lastZ))
-                    active.interpolatedAccelX.append(lastX + scale * (vector.x - lastX))
-                    active.interpolatedAccelY.append(lastY + scale * (vector.y - lastY))
-                    active.interpolatedAccelZ.append(lastZ + scale * (vector.z - lastZ))
+                    active.accelX.append(lastX + scale * (vector_local.x - lastX))
+                    active.accelY.append(lastY + scale * (vector_local.y - lastY))
+                    active.accelZ.append(lastZ + scale * (vector_local.z - lastZ))
+                    active.interpolatedAccelX.append(lastX + scale * (vector_local.x - lastX))
+                    active.interpolatedAccelY.append(lastY + scale * (vector_local.y - lastY))
+                    active.interpolatedAccelZ.append(lastZ + scale * (vector_local.z - lastZ))
                 }
                 unwrappedTimeStamp = Int64(timestamp) + active.maxAccelSensorTimeStamp
                 active.prevAccelSensorTimeStamp = timestamp
                 active.accelTimeStamp.append(Double(unwrappedTimeStamp) * 0.01)
                 //Buffer stores x, y and z accelerometer data from frames.
-                active.accelX.append(vector.x)
-                active.accelY.append(vector.y)
-                active.accelZ.append(vector.z)
+                active.accelX.append(vector_local.x)
+                active.accelY.append(vector_local.y)
+                active.accelZ.append(vector_local.z)
                 active.interpolatedAccelX.append(0.0)
                 active.interpolatedAccelY.append(0.0)
                 active.interpolatedAccelZ.append(0.0)
