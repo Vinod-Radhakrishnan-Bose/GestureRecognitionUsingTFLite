@@ -8,6 +8,7 @@
 import UIKit
 import BoseWearable
 import Charts
+import Accelerate
 
 /// A result from invoking the `Interpreter`.
 struct SensorData {
@@ -241,6 +242,12 @@ class activity{
         return array
     }
     
+    func aggregateData(sensor_dimension_ordering : [String], num_values_per_sensor_dimenion : Int) {
+        aggregatedData = []
+        for index in 0..<sensor_dimension_ordering.count {
+         aggregatedData += returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
+         }
+    }
     func flushDataBuffers() {
         self.accel.flushSensorData()
         self.gyro.flushSensorData()
@@ -260,4 +267,19 @@ func getCurrentTimeStamp() -> String {
     
     let dataString:String =  formatter.string(from: Date())
     return dataString
+}
+
+//Normalization func. Currently not being used as model does not require normalization. (Data - Mean / Standard deviation)
+func normalize(str:[Double]) -> [Double]{
+    var res:[Double] = []
+    var mean: Double = 0.0
+    vDSP_meanvD(str, 1, &mean, vDSP_Length(str.count))
+    var msv:Double=0.0
+    vDSP_measqvD(str, 1, &msv, vDSP_Length(str.count))
+    let std = sqrt(msv - mean * mean) * sqrt(Double(str.count)/Double(str.count))
+    for i in str {
+        res.append((i-mean)/std)
+    }
+    return (res)
+    
 }

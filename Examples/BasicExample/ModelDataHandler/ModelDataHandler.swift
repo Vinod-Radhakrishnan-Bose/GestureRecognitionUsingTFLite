@@ -75,7 +75,25 @@ class ModelDataHandler {
             fatalError("Invalid Sig Def YAML file. Try again.")
         }
     }
-
+    // Aayush: prediction algorithm
+    //This is a recursive function that defines the prediction flow. X, Y and Z buffers get data continuously, but we only take the last 80 elements for the real time prediction. (Frames are caliberated at 25Hz, hence buffer takes 3.2 seconds to get filled up. (25 * 3.2 = 80). all axis data is stored in a single buffer with shape (1,240), which gets passed to mlMultiArray. Prediction happens with this data. After 4 seconds the function is self called for the second prediction.
+    
+    func predictActivity(aggregatedData:[Double]) -> (String, String) {
+        
+        var sensorDataBytes : [Float] = []
+        
+        for (_, element) in aggregatedData.enumerated() {
+            sensorDataBytes.append(Float(element))
+        }
+        // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
+        let result = runModel(input: Data(buffer: UnsafeBufferPointer(start: sensorDataBytes, count: sensorDataBytes.count)))
+        //Changing the text of the predictionLabel
+        let predictionLabel = result!.inferences[0].label//prediction?.classLabel
+        let confidenceLabel = String(describing : Int16((result!.inferences[0].confidence) * 100.0)) + "%\n"
+        
+        return (predictionLabel, confidenceLabel)
+    }
+    
     func runModel(input: Data) -> Result? {
 
         let interval: TimeInterval

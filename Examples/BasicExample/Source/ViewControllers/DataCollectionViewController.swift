@@ -6,11 +6,8 @@
 import BoseWearable
 import UIKit
 import MessageUI
-import MediaPlayer
 import CoreMotion
 import AVFoundation
-import Accelerate
-import CoreImage
 import Charts
 
 class DataCollectionViewController: UIViewController, MFMailComposeViewControllerDelegate {
@@ -216,7 +213,10 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         
         // perform inferencing every 4 seconds
         if counter % 4 == 0 {
-            self.Result()
+            active.aggregateData(sensor_dimension_ordering: modelDataHandler!.sensor_dimension_ordering, num_values_per_sensor_dimenion: modelDataHandler!.num_values_per_sensor_dimenion)
+            let (prediction_label, prediction_confidence) = modelDataHandler!.predictActivity(aggregatedData: active.aggregatedData)
+            predictionLabel.text = prediction_label
+            confidenceLabel.text = prediction_confidence
         }
        //after 60 secs, recording will stop automatically. Beep will sound.
         if counter == 60
@@ -227,43 +227,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             AudioServicesPlaySystemSound(self.systemSoundID)
             stopTimer()
         }
-        
-    }
-    
-    //Normalization func. Currently not being used as model does not require normalization. (Data - Mean / Standard deviation)
-    func normalize(str:[Double]) -> [Double]{
-        var res:[Double] = []
-        var mean: Double = 0.0
-        vDSP_meanvD(str, 1, &mean, vDSP_Length(str.count))
-        var msv:Double=0.0
-        vDSP_measqvD(str, 1, &msv, vDSP_Length(str.count))
-        let std = sqrt(msv - mean * mean) * sqrt(Double(str.count)/Double(str.count))
-        for i in str {
-            res.append((i-mean)/std)
-        }
-        return (res)
-        
-    }
-    
-    // Aayush: prediction algorithm
-    //This is a recursive function that defines the prediction flow. X, Y and Z buffers get data continuously, but we only take the last 80 elements for the real time prediction. (Frames are caliberated at 25Hz, hence buffer takes 3.2 seconds to get filled up. (25 * 3.2 = 80). all axis data is stored in a single buffer with shape (1,240), which gets passed to mlMultiArray. Prediction happens with this data. After 4 seconds the function is self called for the second prediction.
-    
-    func Result() {
-
-        var sensorDataBytes : [Float] = []
-        self.active.aggregatedData = []
-        for index in 0..<modelDataHandler!.sensor_dimension_ordering.count {
-            self.active.aggregatedData += self.active.returnSensorDimension(name:modelDataHandler!.sensor_dimension_ordering[index]).suffix(modelDataHandler!.num_values_per_sensor_dimenion)
-        }
-
-        for (_, element) in active.aggregatedData.enumerated() {
-            sensorDataBytes.append(Float(element))
-        }
-        // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
-        let result = modelDataHandler?.runModel(input: Data(buffer: UnsafeBufferPointer(start: sensorDataBytes, count: sensorDataBytes.count)))
-       //Changing the text of the predictionLabel
-        predictionLabel.text = result?.inferences[0].label//prediction?.classLabel
-        confidenceLabel.text = String(describing : Int16((result?.inferences[0].confidence ?? 0.0) * 100.0)) + "%\n"
     }
     
     @IBAction func emailData(_ sender: Any) {
