@@ -312,12 +312,12 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     func Result() {
 
         var sensorDataBytes : [Float] = []
-        self.active.mainData = []
+        self.active.aggregatedData = []
         for index in 0..<sensor_dimension_ordering.count {
-            self.active.mainData += returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
+            self.active.aggregatedData += returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
         }
 
-        for (_, element) in active.mainData.enumerated() {
+        for (_, element) in active.aggregatedData.enumerated() {
             sensorDataBytes.append(Float(element))
         }
         // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
@@ -393,7 +393,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     //Empty the buffer if stop button gets called
     func stopResult()
     {
-        self.active.mainData=[]
+        self.active.aggregatedData=[]
     }
     
     func setUpDataCollectionLogFiles()  {
@@ -500,9 +500,6 @@ extension DataCollectionViewController: SensorDispatchHandler {
     }
     func receivedGyroscope(vector: Vector, accuracy: VectorAccuracy, timestamp: SensorTimestamp)  {
         var vector_local = vector
-        var unwrappedTimeStamp:Int64 = 0
-        var timeStampDelta:Int = 0
-        let millisecToSec = 0.001
         if(dataCollectionStaretd)
         {
             var GyroData:String = ""

@@ -5,20 +5,21 @@
 //  Created by Aayush Sinha on 3/14/19.
 //  Copyright © 2019 Bose Corporation. All rights reserved.
 //
-import CoreML
-import Foundation
 
 /// A result from invoking the `Interpreter`.
 struct SensorData {
-    var dataX:[Double]
-    var dataY:[Double]
-    var dataZ:[Double]
-    var dataTimeStamp:[Double]
-    var prevDataTimeStamp:UInt16
-    var maxDataTimeStamp:Int64
-    var interpolatedDataX:[Double]
-    var interpolatedDataY:[Double]
-    var interpolatedDataZ:[Double]
+    var dataX:[Double] // array for storing X-dimension of sensor data
+    var dataY:[Double] // Y-dimension and
+    var dataZ:[Double] // Z-dimension
+    var dataTimeStamp:[Double] // array for unwrapped timestamps corresponding to sensor data
+    var prevDataTimeStamp:UInt16 // array for wrapped timestamp for previous data point. Used
+                                 // to detect wraparounds in sensor timestamp
+    var maxDataTimeStamp:Int64   // unwrapped base timestamp for historical data. This will be
+                                 // added to the wrapped timestamp to create the unwrapped timestamp
+                                 // for each new data point
+    var interpolatedDataX:[Double] // Array for storing interpolated sensor data X-dimension for Debug purposes
+    var interpolatedDataY:[Double] // Y-dimension interpolated data and
+    var interpolatedDataZ:[Double] // Z-dimension interpolated data.
     
     init(initDataX: [Double]? = [],
          initDataY: [Double]? = [],
@@ -45,9 +46,9 @@ class activity{
     
     var accel:SensorData = SensorData()
     var gyro:SensorData = SensorData()
-    var mainData:[Double]=[]
+    var aggregatedData:[Double]=[]
 
     init(){
-        self.mainData=[]
+        self.aggregatedData=[]
     }
 }

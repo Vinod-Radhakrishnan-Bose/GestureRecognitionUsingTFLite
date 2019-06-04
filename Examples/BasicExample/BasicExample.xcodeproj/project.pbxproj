@@ -10,7 +10,7 @@
 		2466ABD022A53B290060019E /* activity_recognition_model_config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */; };
 		2466ABD222A586E70060019E /* look_left_look_up_model_config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABD122A586E70060019E /* look_left_look_up_model_config.yml */; };
 		248BBE7B22A03FED003856C5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 248BBE7922A03FED003856C5 /* Main.storyboard */; };
-		24B7D30A229EB1EE00BC36B0 /* ActivityData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D309229EB1DA00BC36B0 /* ActivityData.swift */; };
+		24B7D30A229EB1EE00BC36B0 /* SensorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D309229EB1DA00BC36B0 /* SensorData.swift */; };
 		24B7D30E229EB3F100BC36B0 /* DataCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D30D229EB3F100BC36B0 /* DataCollectionViewController.swift */; };
 		24B7D318229EB7BD00BC36B0 /* ModelDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D314229EB7BD00BC36B0 /* ModelDataHandler.swift */; };
 		24B7D319229EB7BD00BC36B0 /* activity_recognition_model.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D316229EB7BD00BC36B0 /* activity_recognition_model.tflite */; };
@@ -46,7 +46,7 @@
 		2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = activity_recognition_model_config.yml; sourceTree = "<group>"; };
 		2466ABD122A586E70060019E /* look_left_look_up_model_config.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = look_left_look_up_model_config.yml; sourceTree = "<group>"; };
 		248BBE7A22A03FED003856C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
-		24B7D309229EB1DA00BC36B0 /* ActivityData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityData.swift; sourceTree = "<group>"; };
+		24B7D309229EB1DA00BC36B0 /* SensorData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorData.swift; sourceTree = "<group>"; };
 		24B7D30D229EB3F100BC36B0 /* DataCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataCollectionViewController.swift; sourceTree = "<group>"; };
 		24B7D314229EB7BD00BC36B0 /* ModelDataHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelDataHandler.swift; sourceTree = "<group>"; };
 		24B7D316229EB7BD00BC36B0 /* activity_recognition_model.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = activity_recognition_model.tflite; sourceTree = "<group>"; };
@@ -133,7 +133,7 @@
 		C568AC3A21AC6D9F00FFE42E /* Source */ = {
 			isa = PBXGroup;
 			children = (
-				24B7D309229EB1DA00BC36B0 /* ActivityData.swift */,
+				24B7D309229EB1DA00BC36B0 /* SensorData.swift */,
 				C568AC3B21AC6D9F00FFE42E /* AppDelegate.swift */,
 				C568AC8421AC8CB700FFE42E /* Common */,
 				C568AC4721AC6D9F00FFE42E /* Info.plist */,
@@ -329,7 +329,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				24B7D30A229EB1EE00BC36B0 /* ActivityData.swift in Sources */,
+				24B7D30A229EB1EE00BC36B0 /* SensorData.swift in Sources */,
 				24B7D318229EB7BD00BC36B0 /* ModelDataHandler.swift in Sources */,
 				C568AC7C21AC8A8B00FFE42E /* HomeViewController.swift in Sources */,
 				C568AC8921AC8CB700FFE42E /* UIFont+MonospacedNumbers.swift in Sources */,
