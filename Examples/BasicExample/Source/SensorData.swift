@@ -7,6 +7,7 @@
 //
 import UIKit
 import BoseWearable
+import Charts
 
 /// A result from invoking the `Interpreter`.
 struct SensorData {
@@ -158,6 +159,43 @@ struct SensorData {
             self.interpolatedDataZ = self.interpolatedDataZ.suffix(240)
         }
     }
+    
+    func updateSensorGraph() -> LineChartData {
+        let sensorLineChart = LineChartData() //This is the object that will be added to the chart
+        let line1 : LineChartDataSet = addCurve(curveName : self.dataX, timestamps : self.dataTimeStamp, label : "Data-X", color : NSUIColor.blue)
+        let line2 : LineChartDataSet = addCurve(curveName : self.dataY, timestamps : self.dataTimeStamp, label : "Data-Y", color : NSUIColor.red)
+        let line3 : LineChartDataSet = addCurve(curveName : self.dataZ, timestamps : self.dataTimeStamp, label : "Data-Z", color : NSUIColor.green)
+        let line4 : LineChartDataSet = addCurve(curveName : self.interpolatedDataX, timestamps : self.dataTimeStamp, label : "interpolatedData-X", color : NSUIColor.black)
+        let line5 : LineChartDataSet = addCurve(curveName : self.interpolatedDataY, timestamps : self.dataTimeStamp, label : "interpolatedData-X", color : NSUIColor.cyan)
+        let line6 : LineChartDataSet = addCurve(curveName : self.interpolatedDataZ, timestamps : self.dataTimeStamp, label : "interpolatedData-Z", color : NSUIColor.yellow)
+        
+        
+        sensorLineChart.addDataSet(line1) //Adds the line to the dataSet
+        sensorLineChart.addDataSet(line2) //Adds the line to the dataSet
+        sensorLineChart.addDataSet(line3) //Adds the line to the dataSet
+        sensorLineChart.addDataSet(line4) //Adds the line to the dataSet
+        sensorLineChart.addDataSet(line5) //Adds the line to the dataSet
+        sensorLineChart.addDataSet(line6) //Adds the line to the dataSet
+        
+        return sensorLineChart
+    }
+    func addCurve(curveName : [Double], timestamps : [Double], label : String, color : NSUIColor) -> LineChartDataSet {
+        
+        var lineChartEntry  = [ChartDataEntry]() //this is the Array that will eventually be displayed on the graph.
+        
+        //here is the for loop
+        for i in 0..<curveName.count {
+            
+            let value = ChartDataEntry(x: timestamps[i], y: curveName[i]) // here we set the X and Y status in a data chart entry
+            lineChartEntry.append(value) // here we add it to the data set
+        }
+        
+        let line1 = LineChartDataSet(entries: lineChartEntry, label: label) //Here we convert lineChartEntry to a LineChartDataSet
+        line1.colors = [color] //Sets the colour to blue
+        line1.drawCirclesEnabled = false
+        
+        return line1
+    }
 }
 
 class activity{
@@ -193,9 +231,17 @@ class activity{
         }
         return array
     }
+    
     func flushDataBuffers() {
         self.accel.flushSensorData()
         self.gyro.flushSensorData()
+    }
+    
+    func updateGraph() -> (LineChartData, LineChartData){
+        let accelChart = self.accel.updateSensorGraph()
+        let gyroChart = self.gyro.updateSensorGraph()
+        
+        return (accelChart,gyroChart)
     }
 }
 
