@@ -9,14 +9,11 @@ import MessageUI
 import MediaPlayer
 import CoreMotion
 import AVFoundation
-import CoreML
 import Accelerate
-import TensorFlowLite
 import CoreImage
 import Charts
-import Yaml
 
-class DataCollectionViewController: UIViewController, MFMailComposeViewControllerDelegate, UITableViewDataSource, UITableViewDelegate {
+class DataCollectionViewController: UIViewController, MFMailComposeViewControllerDelegate {
     
     @IBOutlet weak var accelChart: LineChartView!
     @IBOutlet weak var gyroChart: LineChartView!
@@ -49,27 +46,11 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     
     var dataCollectionStaretd:Bool = false
     
-    var recordWavFileOnly:Bool = false
-    var recordingSession:AVAudioSession!
-    var audioRecorder: AVAudioRecorder!
-    var meteringTimer = Timer()
-    var audioRecorderSettings = [String : Int]()
-    
-    var wavFileURLList = [URL]()
     var wavFileNameList = [String]()
-    var wavFileVersion:Int = 1
-    var wavFileTimmer = Timer()
-    var uploadingWavFileToST:Bool = false
     var wavTableCellSelected:Int?
 
     let motionManager = CMMotionManager()
-    
-    var num_values_per_sensor_dimenion = 100
-    var sensor_dimension_ordering:[String] = []
-    var normalization_value:[Double] = []
-    var normalization_values_loaded = false
-    var model_sample_period:Int = 20
-    
+        
     // Handles all data preprocessing and makes calls to run inference through TfliteWrapper
     private var modelDataHandler: ModelDataHandler?
     
@@ -79,11 +60,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         predictionLabel.text = "Prediction: "
         confidenceLabel.text = "Confidence: "
         myTimer.text = "0"
-//        var active:activity
-        // We set this object as the sensor dispatch handler in order to receive
-        // sensor data.
-        //sensorDispatch.handler = self
-        
         sensorDispatch.handler = self as? SensorDispatchHandler
         
         // Do any additional setup after loading the view.
@@ -102,29 +78,11 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             fatalError("Sig Def YAML file not found in bundle. Please add and try again.")
         }
         do {
-            let contents = try String(contentsOf: fileURL, encoding: .utf8)
-            let configuration = try! Yaml.load(contents)
-            //print(configuration)
-            print(configuration["num_results"])
-            let num_results = configuration["num_results"].int!
-            let modelInfo:FileInfo = (name:configuration["model_filename"].string!, extension:"")
-            let labelInfo:FileInfo = (name:configuration["labels_filename"].string!, extension:"")
             modelDataHandler =
-                ModelDataHandler(modelFileInfo: modelInfo, labelsFileInfo: labelInfo ,
-                                 configuredResultCount: num_results)
+                ModelDataHandler(configFileName: "look_left_look_up_model_config.yml")
             guard modelDataHandler != nil else {
                 fatalError("Model set up failed")
             }
-            num_values_per_sensor_dimenion = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
-            for index in 0..<configuration["data_format"]["sensor_dimension_ordering"].count! {
-                let sensor_dim = configuration["data_format"]["sensor_dimension_ordering"][index].string!
-                sensor_dimension_ordering.append(sensor_dim)
-                normalization_value.append(configuration["data_format"]["normalization_value"][index].double!)
-            }
-            normalization_values_loaded = true
-            model_sample_period = configuration["data_format"]["sample_period"].int!
-        } catch {
-            fatalError("Invalid Sig Def YAML file. Try again.")
         }
         
         accelChart.chartDescription?.text = "Accelerometer" // Here we set the description for the graph
@@ -298,8 +256,8 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
 
         var sensorDataBytes : [Float] = []
         self.active.aggregatedData = []
-        for index in 0..<sensor_dimension_ordering.count {
-            self.active.aggregatedData += self.active.returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
+        for index in 0..<modelDataHandler!.sensor_dimension_ordering.count {
+            self.active.aggregatedData += self.active.returnSensorDimension(name:modelDataHandler!.sensor_dimension_ordering[index]).suffix(modelDataHandler!.num_values_per_sensor_dimenion)
         }
 
         for (_, element) in active.aggregatedData.enumerated() {
@@ -313,9 +271,9 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     }
 
     func returnSensorDimensionNormalizationValue(name:String)->Double {
-        let index = sensor_dimension_ordering.lastIndex(of: name)
+        let index = modelDataHandler!.sensor_dimension_ordering.lastIndex(of: name)
         if index != nil {
-            return normalization_value[index!]
+            return modelDataHandler!.normalization_value[index!]
         } else {
             return 1.0
         }
@@ -373,7 +331,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     }
     
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    /*func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return wavFileNameList.count
     }
     
@@ -392,7 +350,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         print("Index Selected \(indexPath.row)")
         
         wavTableCellSelected = indexPath.row
-    }
+    }*/
     
 }
 
@@ -429,7 +387,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
             normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_z")
             vector_local.z /= normalization_factor
             
-            active.accel.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: model_sample_period)
+            active.accel.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: modelDataHandler!.model_sample_period)
 
         }
     }
@@ -459,7 +417,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
             normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_z")
             vector_local.z /= normalization_factor
 
-            active.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: model_sample_period)
+            active.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: modelDataHandler!.model_sample_period)
         }
     }
 

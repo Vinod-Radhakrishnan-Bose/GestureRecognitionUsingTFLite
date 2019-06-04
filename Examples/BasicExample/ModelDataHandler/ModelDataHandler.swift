@@ -7,6 +7,7 @@
 //
 
 import TensorFlowLite
+import Yaml
 
 /// A result from invoking the `Interpreter`.
 struct Result {
@@ -30,7 +31,11 @@ class ModelDataHandler {
     
     // MARK: - Public Properties
     var resultCount = 1
-    
+    var num_values_per_sensor_dimenion = 100
+    var sensor_dimension_ordering:[String] = []
+    var normalization_value:[Double] = []
+    var model_sample_period:Int = 20
+
     // MARK: - Private Properties
     
     /// List of labels from the given labels file.
@@ -41,50 +46,36 @@ class ModelDataHandler {
 
     /// A failable initializer for `ModelDataHandler`. A new instance is created if the model and
     /// labels files are successfully loaded from the app's main bundle. Default `threadCount` is 1.
-    init?(modelFileInfo: FileInfo, labelsFileInfo: FileInfo, threadCount: Int = 1, configuredResultCount: Int = 3) {
-        let modelFilename = modelFileInfo.name
-        
-        // Construct the path to the model file.
-        guard let modelPath = Bundle.main.path(
-            forResource: modelFilename,
-            ofType: modelFileInfo.extension
-            ) else {
-                print("Failed to load the model file with name: \(modelFilename).")
-                return nil
-        }
-        
-        // Specify the options for the `Interpreter`.
-        var options = InterpreterOptions()
-        options.threadCount = threadCount
-        do {
-            // Create the `Interpreter`.
-            interpreter = try Interpreter(modelPath: modelPath, options: options)
-        } catch let error {
-            print("Failed to create the interpreter with error: \(error.localizedDescription)")
-            return nil
-        }
-        // Load the classes listed in the labels file.
-        loadLabels(fileInfo: labelsFileInfo)
-        
-        resultCount = configuredResultCount
-    }
-    /// Loads the labels from the labels file and stores them in the `labels` property.
-    private func loadLabels(fileInfo: FileInfo) {
-        let filename = fileInfo.name
-        let fileExtension = fileInfo.extension
-        guard let fileURL = Bundle.main.url(forResource: filename, withExtension: fileExtension) else {
-            fatalError("Labels file not found in bundle. Please add a labels file with name " +
-                "\(filename).\(fileExtension) and try again.")
+    init?(configFileName: String)
+    {
+        //guard let fileURL = Bundle.main.url(forResource: "model_config_activity_recognition", withExtension: "yml") else {
+        guard let fileURL = Bundle.main.url(forResource: configFileName, withExtension: "") else {
+            fatalError("Model configuration YAML file not found in bundle. Please add it and try again.")
         }
         do {
             let contents = try String(contentsOf: fileURL, encoding: .utf8)
-            labels = contents.components(separatedBy: .newlines)
+            let configuration = try! Yaml.load(contents)
+            let num_results = configuration["num_results"].int!
+            let modelInfo:FileInfo = (name:configuration["model_filename"].string!, extension:"")
+            let labelInfo:FileInfo = (name:configuration["labels_filename"].string!, extension:"")
+            interpreter = loadModel(modelFileInfo: modelInfo, labelsFileInfo: labelInfo ,
+            configuredResultCount: num_results)!
+            // Load the classes listed in the labels file.
+            resultCount = num_results
+            
+            num_values_per_sensor_dimenion = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
+            for index in 0..<configuration["data_format"]["sensor_dimension_ordering"].count! {
+                let sensor_dim = configuration["data_format"]["sensor_dimension_ordering"][index].string!
+                sensor_dimension_ordering.append(sensor_dim)
+                normalization_value.append(configuration["data_format"]["normalization_value"][index].double!)
+            }
+            model_sample_period = configuration["data_format"]["sample_period"].int!
+            labels = loadLabels(fileInfo: labelInfo)
         } catch {
-            fatalError("Labels file named \(filename).\(fileExtension) cannot be read. Please add a " +
-                "valid labels file and try again.")
+            fatalError("Invalid Sig Def YAML file. Try again.")
         }
     }
-    
+
     func runModel(input: Data) -> Result? {
 
         let interval: TimeInterval
@@ -169,3 +160,45 @@ extension Array {
     }
 }
 
+func loadModel(modelFileInfo: FileInfo, labelsFileInfo: FileInfo, threadCount: Int = 1, configuredResultCount: Int = 3) -> Interpreter? {
+    let modelFilename = modelFileInfo.name
+    var interpreter : Interpreter
+    // Construct the path to the model file.
+    guard let modelPath = Bundle.main.path(
+        forResource: modelFilename,
+        ofType: modelFileInfo.extension
+        ) else {
+            print("Failed to load the model file with name: \(modelFilename).")
+            return nil
+    }
+    
+    // Specify the options for the `Interpreter`.
+    var options = InterpreterOptions()
+    options.threadCount = threadCount
+    do {
+        // Create the `Interpreter`.
+        interpreter = try Interpreter(modelPath: modelPath, options: options)
+    } catch let error {
+        print("Failed to create the interpreter with error: \(error.localizedDescription)")
+        //throw false
+        return nil
+    }
+    return interpreter
+}
+
+/// Loads the labels from the labels file and stores them in the `labels` property.
+func loadLabels(fileInfo: FileInfo) -> [String] {
+    let filename = fileInfo.name
+    let fileExtension = fileInfo.extension
+    guard let fileURL = Bundle.main.url(forResource: filename, withExtension: fileExtension) else {
+        fatalError("Labels file not found in bundle. Please add a labels file with name " +
+            "\(filename).\(fileExtension) and try again.")
+    }
+    do {
+        let contents = try String(contentsOf: fileURL, encoding: .utf8)
+        return contents.components(separatedBy: .newlines)
+    } catch {
+        fatalError("Labels file named \(filename).\(fileExtension) cannot be read. Please add a " +
+            "valid labels file and try again.")
+    }
+}
