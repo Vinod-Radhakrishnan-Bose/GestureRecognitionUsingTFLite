@@ -30,11 +30,11 @@ typealias FileInfo = (name: String, extension: String)
 class ModelDataHandler {
     
     // MARK: - Public Properties
-    var resultCount = 1
-    var num_values_per_sensor_dimenion = 100
-    var sensor_dimension_ordering:[String] = []
-    var normalization_value:[Double] = []
-    var model_sample_period:Int = 20
+    var resultCount = 1 // Number of results to report
+    var numValuesPerSensorDim = 100 // Number of values per sensor-dimension (i.e. number of values of accel-x, number of values of accel-y etc.)
+    var sensorDimOrdering:[String] = [] // How should data be formatted before invoking model (for ex. <-- accel_x array ---> <--- accel-y array> etc.
+    var sensorDimNormalization:[Double] = [] // Normalization values used for each data dimension
+    var modelSamplePeriod:Int = 20 // Sample period which was used for model training in ms
 
     // MARK: - Private Properties
     
@@ -55,21 +55,19 @@ class ModelDataHandler {
         do {
             let contents = try String(contentsOf: fileURL, encoding: .utf8)
             let configuration = try! Yaml.load(contents)
-            let num_results = configuration["num_results"].int!
+            resultCount = configuration["num_results"].int!
             let modelInfo:FileInfo = (name:configuration["model_filename"].string!, extension:"")
             let labelInfo:FileInfo = (name:configuration["labels_filename"].string!, extension:"")
             interpreter = loadModel(modelFileInfo: modelInfo, labelsFileInfo: labelInfo ,
-            configuredResultCount: num_results)!
-            // Load the classes listed in the labels file.
-            resultCount = num_results
+            configuredResultCount: resultCount)!
             
-            num_values_per_sensor_dimenion = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
+            numValuesPerSensorDim = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
             for index in 0..<configuration["data_format"]["sensor_dimension_ordering"].count! {
-                let sensor_dim = configuration["data_format"]["sensor_dimension_ordering"][index].string!
-                sensor_dimension_ordering.append(sensor_dim)
-                normalization_value.append(configuration["data_format"]["normalization_value"][index].double!)
+                let sensorDim = configuration["data_format"]["sensor_dimension_ordering"][index].string!
+                sensorDimOrdering.append(sensorDim)
+                sensorDimNormalization.append(configuration["data_format"]["normalization_value"][index].double!)
             }
-            model_sample_period = configuration["data_format"]["sample_period"].int!
+            modelSamplePeriod = configuration["data_format"]["sample_period"].int!
             labels = loadLabels(fileInfo: labelInfo)
         } catch {
             fatalError("Invalid Sig Def YAML file. Try again.")
@@ -153,9 +151,9 @@ class ModelDataHandler {
     }
 
     func returnSensorDimensionNormalizationValue(name:String)->Double {
-        let index = sensor_dimension_ordering.lastIndex(of: name)
+        let index = sensorDimOrdering.lastIndex(of: name)
         if index != nil {
-            return normalization_value[index!]
+            return sensorDimNormalization[index!]
         } else {
             return 1.0
         }

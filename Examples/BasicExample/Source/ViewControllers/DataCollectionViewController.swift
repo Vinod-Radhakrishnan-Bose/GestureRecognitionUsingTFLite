@@ -18,7 +18,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     //Get the beep sound
     let systemSoundID: SystemSoundID = 1052
     
-    var active:activity = activity()
+    var deviceData:DeviceData = DeviceData()
     
     @IBOutlet weak var timerLabelToShowWordTimer: UILabel!
     @IBOutlet weak var myTimer: UILabel!
@@ -207,14 +207,14 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         
         counter = counter + 1
         myTimer.text = String(counter)
-        let (lineChart1, lineChart2) =  self.active.updateGraph()
+        let (lineChart1, lineChart2) =  self.deviceData.updateGraph()
         accelChart.data = lineChart1
         gyroChart.data = lineChart2
         
         // perform inferencing every 4 seconds
         if counter % 4 == 0 {
-            active.aggregateData(sensor_dimension_ordering: modelDataHandler!.sensor_dimension_ordering, num_values_per_sensor_dimenion: modelDataHandler!.num_values_per_sensor_dimenion)
-            let (prediction_label, prediction_confidence) = modelDataHandler!.predictActivity(aggregatedData: active.aggregatedData)
+            deviceData.aggregateData(sensorDimOrdering: modelDataHandler!.sensorDimOrdering, numValuesPerSensorDim: modelDataHandler!.numValuesPerSensorDim)
+            let (prediction_label, prediction_confidence) = modelDataHandler!.predictActivity(aggregatedData: deviceData.aggregatedData)
             predictionLabel.text = prediction_label
             confidenceLabel.text = prediction_confidence
         }
@@ -242,16 +242,16 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             mailComposer.setMessageBody("Kindly find sample data in the attachment", isHTML: false)
             
             
-            if let AccelData = NSData(contentsOf: self.active.accel.logFileURL!) {
+            if let AccelData = NSData(contentsOf: self.deviceData.accel.logFileURL!) {
                 print("Accel Data loaded.")
                 
-                mailComposer.addAttachmentData(AccelData as Data, mimeType: "text/txt", fileName: self.active.accel.logFileName)
+                mailComposer.addAttachmentData(AccelData as Data, mimeType: "text/txt", fileName: self.deviceData.accel.logFileName)
             }
             
-            if let GyroData = NSData(contentsOf: self.active.gyro.logFileURL!) {
+            if let GyroData = NSData(contentsOf: self.deviceData.gyro.logFileURL!) {
                 print("Gyro Data path loaded.")
                 
-                mailComposer.addAttachmentData(GyroData as Data, mimeType: "text/txt", fileName: self.active.gyro.logFileName)
+                mailComposer.addAttachmentData(GyroData as Data, mimeType: "text/txt", fileName: self.deviceData.gyro.logFileName)
             }
             
             self.navigationController?.present(mailComposer, animated: true, completion: nil)
@@ -264,7 +264,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     //Empty the buffer if stop button gets called
     func stopResult()
     {
-        self.active.aggregatedData=[]
+        self.deviceData.aggregatedData=[]
     }
 }
 
@@ -289,9 +289,9 @@ extension DataCollectionViewController: SensorDispatchHandler {
                 AccelData += "\(String(describing: accelerometerData.acceleration.x)), "
                 AccelData += "\(String(describing: accelerometerData.acceleration.y)), "
                 AccelData += "\(String(describing: accelerometerData.acceleration.z)) \n"
-                active.accel.writeToLogFile(txt: AccelData)
+                deviceData.accel.writeToLogFile(txt: AccelData)
             }
-            active.accel.appendSensorData(timeStamp:timestamp, vector:vector, modelDataHandler: modelDataHandler!)
+            deviceData.accel.appendSensorData(timeStamp:timestamp, vector:vector, modelDataHandler: modelDataHandler!)
 
         }
     }
@@ -311,9 +311,9 @@ extension DataCollectionViewController: SensorDispatchHandler {
                 GyroData += "\(String(describing: gyroData.rotationRate.x)), "
                 GyroData += "\(String(describing: gyroData.rotationRate.y)), "
                 GyroData += "\(String(describing: gyroData.rotationRate.z)) \n"
-                active.gyro.writeToLogFile(txt: GyroData)
+                deviceData.gyro.writeToLogFile(txt: GyroData)
             }
-            active.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, modelDataHandler: modelDataHandler!)
+            deviceData.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, modelDataHandler: modelDataHandler!)
         }
     }
 
@@ -376,7 +376,7 @@ extension DataCollectionViewController: WearableDeviceSessionDelegate {
         self.startStopButton.backgroundColor = .red
         self.startStopButton.setTitle("Stop Recording", for: .normal)
         self.dataCollectionStaretd = true
-        self.active.flushDataBuffers()
+        self.deviceData.flushDataBuffers()
         self.startTimer()
     }
 }

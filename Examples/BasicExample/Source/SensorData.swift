@@ -8,14 +8,13 @@
 import UIKit
 import BoseWearable
 import Charts
-import Accelerate
 
 /// A result from invoking the `Interpreter`.
 class SensorData {
     var dataX:[Double] // array for storing X-dimension of sensor data
     var dataY:[Double] // Y-dimension and
     var dataZ:[Double] // Z-dimension
-    var dataTimeStamp:[Double] // array for unwrapped timestamps corresponding to sensor data
+    var dataTimeStamp:[Double] // array for unwrapped timestamps (converted to double) corresponding to sensor data
     var prevDataTimeStamp:UInt16 // array for wrapped timestamp for previous data point. Used
                                  // to detect wraparounds in sensor timestamp
     var maxDataTimeStamp:Int64   // unwrapped base timestamp for historical data. This will be
@@ -27,7 +26,6 @@ class SensorData {
     var logFileName = "" // Filename for logging sensor data
     var logFileURL:URL? = nil
     var sensorType:String=""
-    var dataType:String=""
     
     private var firstWriteToLogFile:Bool = true
     
@@ -50,9 +48,9 @@ class SensorData {
         interpolatedDataX = initInterpolatedDataX!
         interpolatedDataY = initInterpolatedDataY!
         interpolatedDataZ = initInterpolatedDataZ!
-        dataType = initDataType
+        sensorType = initDataType
         let fileStartRecordTimeStamp = getCurrentTimeStamp()
-        logFileName = dataType + "_" + fileStartRecordTimeStamp + ".csv"
+        logFileName = sensorType + "_" + fileStartRecordTimeStamp + ".csv"
         let fileManager = FileManager.default
         let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
         let documentDirectory = urls[0] as NSURL
@@ -115,11 +113,11 @@ class SensorData {
         let millisecToSec = 0.001
         var vector_local = vector
         // Normalize accelerometer values
-        var normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: dataType + "_x")
+        var normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_x")
         vector_local.x /= normalization_factor
-        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: dataType + "_y")
+        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_y")
         vector_local.y /= normalization_factor
-        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: dataType + "_z")
+        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_z")
         vector_local.z /= normalization_factor
 
         if self.prevDataTimeStamp == 0 &&
@@ -129,48 +127,42 @@ class SensorData {
         if timeStamp < self.prevDataTimeStamp {
             // Handle wraparounds
             self.maxDataTimeStamp += Int64(65536)
-            timeStampDelta = Int(round(Double(Int(timeStamp) + 65535 - Int(self.prevDataTimeStamp))/Double(modelDataHandler.model_sample_period)))
+            timeStampDelta = Int(round(Double(Int(timeStamp) + 65535 - Int(self.prevDataTimeStamp))/Double(modelDataHandler.modelSamplePeriod)))
         }
         else {
-            timeStampDelta = Int(round(Double(Int(timeStamp) - Int(self.prevDataTimeStamp))/Double(modelDataHandler.model_sample_period)))
+            timeStampDelta = Int(round(Double(Int(timeStamp) - Int(self.prevDataTimeStamp))/Double(modelDataHandler.modelSamplePeriod)))
         }
-        if (timeStampDelta > 10) {
-            /*stopDataCollection()
-            startDataCollection()*/
+        for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
+            let timeStampBase = self.maxDataTimeStamp + Int64(self.prevDataTimeStamp)
+            self.dataTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(modelDataHandler.modelSamplePeriod)) * millisecToSec)
+            let scale = Double(index)/Double(timeStampDelta)
+            let lastX : Double = self.dataX.last ?? 0.0
+            let lastY : Double = self.dataY.last ?? 0.0
+            let lastZ : Double = self.dataZ.last ?? 0.0
+            self.dataX.append(lastX + scale * (vector.x - lastX))
+            self.dataY.append(lastY + scale * (vector.y - lastY))
+            self.dataZ.append(lastZ + scale * (vector.z - lastZ))
+            self.interpolatedDataX.append(lastX + scale * (vector.x - lastX))
+            self.interpolatedDataY.append(lastY + scale * (vector.y - lastY))
+            self.interpolatedDataZ.append(lastZ + scale * (vector.z - lastZ))
         }
-        else {
-            for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
-                let timeStampBase = self.maxDataTimeStamp + Int64(self.prevDataTimeStamp)
-                self.dataTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(modelDataHandler.model_sample_period)) * millisecToSec)
-                let scale = Double(index)/Double(timeStampDelta)
-                let lastX : Double = self.dataX.last ?? 0.0
-                let lastY : Double = self.dataY.last ?? 0.0
-                let lastZ : Double = self.dataZ.last ?? 0.0
-                self.dataX.append(lastX + scale * (vector.x - lastX))
-                self.dataY.append(lastY + scale * (vector.y - lastY))
-                self.dataZ.append(lastZ + scale * (vector.z - lastZ))
-                self.interpolatedDataX.append(lastX + scale * (vector.x - lastX))
-                self.interpolatedDataY.append(lastY + scale * (vector.y - lastY))
-                self.interpolatedDataZ.append(lastZ + scale * (vector.z - lastZ))
-            }
-            unwrappedTimeStamp = Int64(timeStamp) + self.maxDataTimeStamp
-            self.prevDataTimeStamp = timeStamp
-            self.dataTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
-            //Buffer stores x, y and z accelerometer data from frames.
-            self.dataX.append(vector.x)
-            self.dataY.append(vector.y)
-            self.dataZ.append(vector.z)
-            self.interpolatedDataX.append(0.0)
-            self.interpolatedDataY.append(0.0)
-            self.interpolatedDataZ.append(0.0)
-            self.dataX = self.dataX.suffix(240)
-            self.dataY = self.dataY.suffix(240)
-            self.dataZ = self.dataZ.suffix(240)
-            self.dataTimeStamp = self.dataTimeStamp.suffix(240)
-            self.interpolatedDataX = self.interpolatedDataX.suffix(240)
-            self.interpolatedDataY = self.interpolatedDataY.suffix(240)
-            self.interpolatedDataZ = self.interpolatedDataZ.suffix(240)
-        }
+        unwrappedTimeStamp = Int64(timeStamp) + self.maxDataTimeStamp
+        self.prevDataTimeStamp = timeStamp
+        self.dataTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
+        //Buffer stores x, y and z accelerometer data from frames.
+        self.dataX.append(vector.x)
+        self.dataY.append(vector.y)
+        self.dataZ.append(vector.z)
+        self.interpolatedDataX.append(0.0)
+        self.interpolatedDataY.append(0.0)
+        self.interpolatedDataZ.append(0.0)
+        self.dataX = self.dataX.suffix(240)
+        self.dataY = self.dataY.suffix(240)
+        self.dataZ = self.dataZ.suffix(240)
+        self.dataTimeStamp = self.dataTimeStamp.suffix(240)
+        self.interpolatedDataX = self.interpolatedDataX.suffix(240)
+        self.interpolatedDataY = self.interpolatedDataY.suffix(240)
+        self.interpolatedDataZ = self.interpolatedDataZ.suffix(240)
     }
     
     func updateSensorGraph() -> LineChartData {
@@ -207,77 +199,10 @@ class SensorData {
     }
 }
 
-class activity{
-    
-    var aggregatedData:[Double]=[]
-    var accel:SensorData
-    var gyro:SensorData
-    
-    init(){
-        self.aggregatedData=[]
-        self.accel = SensorData(initDataType:"accel")
-        self.gyro = SensorData(initDataType:"gyro")
-    }
-    
-    func returnSensorDimension(name:String)->[Double] {
-        var array:[Double]=[]
-        switch name {
-        case "accel_x":
-            array = self.accel.dataX
-        case "accel_y":
-            array = self.accel.dataY
-        case "accel_z":
-            array = self.accel.dataZ
-        case "gyro_x":
-            array = self.gyro.dataX
-        case "gyro_y":
-            array = self.gyro.dataY
-        case "gyro_z":
-            array = self.gyro.dataZ
-        default:
-            array = []
-        }
-        return array
-    }
-    
-    func aggregateData(sensor_dimension_ordering : [String], num_values_per_sensor_dimenion : Int) {
-        aggregatedData = []
-        for index in 0..<sensor_dimension_ordering.count {
-         aggregatedData += returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
-         }
-    }
-    func flushDataBuffers() {
-        self.accel.flushSensorData()
-        self.gyro.flushSensorData()
-    }
-    
-    func updateGraph() -> (LineChartData, LineChartData){
-        let accelChart = self.accel.updateSensorGraph()
-        let gyroChart = self.gyro.updateSensorGraph()
-        
-        return (accelChart,gyroChart)
-    }
-}
-
 func getCurrentTimeStamp() -> String {
     let formatter = DateFormatter()
     formatter.dateFormat = "HH-mm-ss-SSS, yyyy-MM-dd"
     
     let dataString:String =  formatter.string(from: Date())
     return dataString
-}
-
-//Normalization func. Currently not being used as model does not require normalization. (Data - Mean / Standard deviation)
-func normalize(str:[Double]) -> [Double]{
-    var res:[Double] = []
-    var mean: Double = 0.0
-    vDSP_meanvD(str, 1, &mean, vDSP_Length(str.count))
-    var msv:Double=0.0
-    vDSP_measqvD(str, 1, &msv, vDSP_Length(str.count))
-    let std = sqrt(msv - mean * mean) * sqrt(Double(str.count)/Double(str.count))
-    for i in str {
-        res.append((i-mean)/std)
-    }
-    return (res)
-    
 }
