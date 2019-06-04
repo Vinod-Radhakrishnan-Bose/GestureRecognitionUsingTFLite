@@ -46,7 +46,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     @IBOutlet weak var confidenceLabel: UILabel!
         
     @IBOutlet weak var startStopButton: UIButton!
-    var fileNameAccel = ""
+    /*var fileNameAccel = ""
     var fileURLAccel:URL? = nil
     var firstWriteToAccelFile:Bool = true
     
@@ -56,7 +56,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     
     var fileNameRoto = ""
     var fileURLRoto:URL? = nil
-    var firstWriteToRotoFile:Bool = true
+    var firstWriteToRotoFile:Bool = true*/
     
     var dataCollectionStaretd:Bool = false
     
@@ -314,7 +314,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         var sensorDataBytes : [Float] = []
         self.active.aggregatedData = []
         for index in 0..<sensor_dimension_ordering.count {
-            self.active.aggregatedData += returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
+            self.active.aggregatedData += self.active.returnSensorDimension(name:sensor_dimension_ordering[index]).suffix(num_values_per_sensor_dimenion)
         }
 
         for (_, element) in active.aggregatedData.enumerated() {
@@ -325,27 +325,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
        //Changing the text of the predictionLabel
         predictionLabel.text = result?.inferences[0].label//prediction?.classLabel
         confidenceLabel.text = String(describing : Int16((result?.inferences[0].confidence ?? 0.0) * 100.0)) + "%\n"
-    }
-    
-    func returnSensorDimension(name:String)->[Double] {
-        var array:[Double]=[]
-        switch name {
-        case "accel_x":
-            array = self.active.accel.dataX
-        case "accel_y":
-            array = self.active.accel.dataY
-        case "accel_z":
-            array = self.active.accel.dataZ
-        case "gyro_x":
-            array = self.active.gyro.dataX
-        case "gyro_y":
-            array = self.active.gyro.dataY
-        case "gyro_z":
-            array = self.active.gyro.dataZ
-        default:
-            array = self.active.accel.dataX
-        }
-        return array
     }
 
     func returnSensorDimensionNormalizationValue(name:String)->Double {
@@ -370,17 +349,16 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             mailComposer.setMessageBody("Kindly find sample data in the attachment", isHTML: false)
             
             
-            if let AccelData = NSData(contentsOf: fileURLAccel!) {
+            if let AccelData = NSData(contentsOf: self.active.accel.logFileURL!) {
                 print("Accel Data loaded.")
                 
-                mailComposer.addAttachmentData(AccelData as Data, mimeType: "text/txt", fileName: fileNameAccel)
+                mailComposer.addAttachmentData(AccelData as Data, mimeType: "text/txt", fileName: self.active.accel.logFileName)
             }
             
-            if let GyroData = NSData(contentsOf: fileURLGyro!) {
+            if let GyroData = NSData(contentsOf: self.active.gyro.logFileURL!) {
                 print("Gyro Data path loaded.")
                 
-                mailComposer.addAttachmentData(GyroData as Data, mimeType: "text/txt", fileName: fileNameGyro)
-                
+                mailComposer.addAttachmentData(GyroData as Data, mimeType: "text/txt", fileName: self.active.gyro.logFileName)
             }
             
             self.navigationController?.present(mailComposer, animated: true, completion: nil)
@@ -396,7 +374,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         self.active.aggregatedData=[]
     }
     
-    func setUpDataCollectionLogFiles()  {
+    /*func setUpDataCollectionLogFiles()  {
         
         // Instead of getting file name from the text field, it needs to come from the options displayed. Once the user has clicked on an activity, example: Walking, the text 'walking' should be in the file name in place of fileNameTextField.text
         // Remove the FileName textbox and just use the label of the button clicked. 
@@ -422,7 +400,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         
         firstWriteToRotoFile = true
        // writeRotoDataCollectionFileHeader()
-    }
+    }*/
     
     func getCurrentTimeStamp() -> String {
         let formatter = DateFormatter()
@@ -483,7 +461,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
                 AccelData += "\(String(describing: accelerometerData.acceleration.x)), "
                 AccelData += "\(String(describing: accelerometerData.acceleration.y)), "
                 AccelData += "\(String(describing: accelerometerData.acceleration.z)) \n"
-                writeToAccelFile(txt: AccelData)
+                active.accel.writeToLogFile(txt: AccelData)
             }
             
             // Normalize accelerometer values
@@ -514,7 +492,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
                 GyroData += "\(String(describing: gyroData.rotationRate.x)), "
                 GyroData += "\(String(describing: gyroData.rotationRate.y)), "
                 GyroData += "\(String(describing: gyroData.rotationRate.z)) \n"
-                writeToGyroFile(txt: GyroData)
+                active.gyro.writeToLogFile(txt: GyroData)
             }
 
             var normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_x")
@@ -585,93 +563,6 @@ extension DataCollectionViewController: SensorDispatchHandler {
         }
         return localSensorData
     }
-    
-    func writeGyroDataCollectionFileHeader()  {
-        var gyroDataHeader:String = ""
-        gyroDataHeader += "timeStamp (ms), "
-        gyroDataHeader += "Bose Gyro X, "
-        gyroDataHeader += "Bose Gyro Y, "
-        gyroDataHeader += "Bose Gyro Z,"
-        gyroDataHeader += "iPhone Gyro X,"
-        gyroDataHeader += "iPhone Gyro Y,"
-        gyroDataHeader += "iPhone Gyro Z \n"
-        
-        writeToGyroFile(txt: gyroDataHeader)
-    }
-    
-    
-    
-    func writeAccelDataCollectionFileHeader()  {
-        var AccelDataHeader:String = ""
-        AccelDataHeader += "timeStamp (ms), "
-        AccelDataHeader += "Bose Accel X, "
-        AccelDataHeader += "Bose Accel Y, "
-        AccelDataHeader += "Bose Accel Z,"
-        AccelDataHeader += "iPhone Accel X, "
-        AccelDataHeader += "iPhone Accel Y, "
-        AccelDataHeader += "iPhone Accel Z \n"
-        
-        writeToAccelFile(txt: AccelDataHeader)
-    }
-    
-
-    
-    func writeToAccelFile(txt:String)  {
-        
-        let data = Data(txt.utf8)
-        
-        if(firstWriteToAccelFile)
-        {
-            firstWriteToAccelFile = false
-            do {
-                try data.write(to: fileURLAccel!, options: .atomic)
-            } catch {
-                print(error)
-            }
-        }
-        else
-        {
-            
-            do {
-                let fileHandle = try FileHandle(forWritingTo: fileURLAccel!)
-                fileHandle.seekToEndOfFile()
-                fileHandle.write(txt.data(using: .utf8)!)
-                fileHandle.closeFile()
-            } catch {
-                print("Error writing to file \(error)")
-            }
-        }
-        
-    }
-    
-    func writeToGyroFile(txt:String)  {
-        
-        let data = Data(txt.utf8)
-        
-        if(firstWriteToGyroFile)
-        {
-            firstWriteToGyroFile = false
-            do {
-                try data.write(to: fileURLGyro!, options: .atomic)
-            } catch {
-                print(error)
-            }
-        }
-        else
-        {
-            
-            do {
-                let fileHandle = try FileHandle(forWritingTo: fileURLGyro!)
-                fileHandle.seekToEndOfFile()
-                fileHandle.write(txt.data(using: .utf8)!)
-                fileHandle.closeFile()
-            } catch {
-                print("Error writing to file \(error)")
-            }
-        }
-        
-    }
-    
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?){
         view.endEditing(true)
@@ -764,23 +655,10 @@ extension DataCollectionViewController: WearableDeviceSessionDelegate {
     }
     
     func flushDataBuffers() {
-        self.active.accel = flushSensorData(sensorData:self.active.accel)
-        self.active.gyro = flushSensorData(sensorData:self.active.gyro)
+        self.active.accel.flushSensorData()
+        self.active.gyro.flushSensorData()
     }
     
-    func flushSensorData(sensorData:SensorData) -> SensorData {
-        var localSensorData = sensorData
-        localSensorData.dataX.removeAll()
-        localSensorData.dataY.removeAll()
-        localSensorData.dataZ.removeAll()
-        localSensorData.dataTimeStamp.removeAll()
-        localSensorData.prevDataTimeStamp = 0
-        localSensorData.maxDataTimeStamp = 0
-        localSensorData.interpolatedDataX.removeAll()
-        localSensorData.interpolatedDataY.removeAll()
-        localSensorData.interpolatedDataZ.removeAll()
-        return localSensorData
-    }
     func stopDataCollection() {
         dataCollectionStaretd = false
         startStopButton.setTitle("Start Recording", for: .normal)
@@ -795,7 +673,7 @@ extension DataCollectionViewController: WearableDeviceSessionDelegate {
         self.startStopButton.backgroundColor = .red
         self.startStopButton.setTitle("Stop Recording", for: .normal)
         self.fileStartRecordTimeStamp = self.getCurrentTimeStamp()
-        self.setUpDataCollectionLogFiles()
+        //self.setUpDataCollectionLogFiles()
         self.dataCollectionStaretd = true
         self.flushDataBuffers()
         self.startTimer()

@@ -89,7 +89,7 @@
 			path = ModelDataHandler;
 			sourceTree = "<group>";
 		};
-		24B7D315229EB7BD00BC36B0 /* Model */ = {
+		24B7D315229EB7BD00BC36B0 /* Models */ = {
 			isa = PBXGroup;
 			children = (
 				2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */,
@@ -99,7 +99,7 @@
 				24B7D317229EB7BD00BC36B0 /* activity_recognition_labels.txt */,
 				24B7D31B229EC12200BC36B0 /* look_left_look_up_labels.txt */,
 			);
-			path = Model;
+			path = Models;
 			sourceTree = "<group>";
 		};
 		24FFFFE7F93BC32B0E1DCB2E /* Frameworks */ = {
@@ -113,7 +113,7 @@
 		C568AC2F21AC6D9F00FFE42E = {
 			isa = PBXGroup;
 			children = (
-				24B7D315229EB7BD00BC36B0 /* Model */,
+				24B7D315229EB7BD00BC36B0 /* Models */,
 				24B7D313229EB7BD00BC36B0 /* ModelDataHandler */,
 				C568AC3A21AC6D9F00FFE42E /* Source */,
 				C568AC3921AC6D9F00FFE42E /* Products */,
