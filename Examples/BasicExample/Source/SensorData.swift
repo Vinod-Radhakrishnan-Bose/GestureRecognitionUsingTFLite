@@ -11,7 +11,7 @@ import Charts
 import Accelerate
 
 /// A result from invoking the `Interpreter`.
-struct SensorData {
+class SensorData {
     var dataX:[Double] // array for storing X-dimension of sensor data
     var dataY:[Double] // Y-dimension and
     var dataZ:[Double] // Z-dimension
@@ -27,6 +27,7 @@ struct SensorData {
     var logFileName = "" // Filename for logging sensor data
     var logFileURL:URL? = nil
     var sensorType:String=""
+    var dataType:String=""
     
     private var firstWriteToLogFile:Bool = true
     
@@ -39,7 +40,7 @@ struct SensorData {
         initInterpolatedDataX:[Double]?=[],
         initInterpolatedDataY:[Double]?=[],
         initInterpolatedDataZ:[Double]?=[],
-        initLogFileName:String) {
+        initDataType:String) {
         dataX = initDataX!
         dataY = initDataY!
         dataZ = initDataZ!
@@ -49,7 +50,9 @@ struct SensorData {
         interpolatedDataX = initInterpolatedDataX!
         interpolatedDataY = initInterpolatedDataY!
         interpolatedDataZ = initInterpolatedDataZ!
-        logFileName = initLogFileName
+        dataType = initDataType
+        let fileStartRecordTimeStamp = getCurrentTimeStamp()
+        logFileName = dataType + "_" + fileStartRecordTimeStamp + ".csv"
         let fileManager = FileManager.default
         let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
         let documentDirectory = urls[0] as NSURL
@@ -57,7 +60,7 @@ struct SensorData {
         firstWriteToLogFile = true
     }
 
-    mutating func flushSensorData() {
+    func flushSensorData() {
         dataX.removeAll()
         dataY.removeAll()
         dataZ.removeAll()
@@ -69,7 +72,7 @@ struct SensorData {
         interpolatedDataZ.removeAll()
     }
     
-    mutating func writeToLogFile(txt:String)  {
+    func writeToLogFile(txt:String)  {
         if(firstWriteToLogFile)
         {
             var txt_string = self.writeLogFileHeader() + txt
@@ -106,17 +109,17 @@ struct SensorData {
         return dataHeader
     }
     
-    mutating func appendSensorData(timeStamp:SensorTimestamp, vector:Vector, modelDataHandler:ModelDataHandler) {
+    func appendSensorData(timeStamp:SensorTimestamp, vector:Vector, modelDataHandler:ModelDataHandler) {
         var unwrappedTimeStamp:Int64 = 0
         var timeStampDelta = 0
         let millisecToSec = 0.001
         var vector_local = vector
         // Normalize accelerometer values
-        var normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: logFileName + "x")
+        var normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: dataType + "_x")
         vector_local.x /= normalization_factor
-        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: logFileName + "y")
+        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: dataType + "_y")
         vector_local.y /= normalization_factor
-        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: logFileName + "z")
+        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: dataType + "_z")
         vector_local.z /= normalization_factor
 
         if self.prevDataTimeStamp == 0 &&
@@ -180,30 +183,26 @@ struct SensorData {
         let line6 : LineChartDataSet = addCurve(curveName : self.interpolatedDataZ, timestamps : self.dataTimeStamp, label : "interpolatedData-Z", color : NSUIColor.yellow)
         
         
-        sensorLineChart.addDataSet(line1) //Adds the line to the dataSet
-        sensorLineChart.addDataSet(line2) //Adds the line to the dataSet
-        sensorLineChart.addDataSet(line3) //Adds the line to the dataSet
-        sensorLineChart.addDataSet(line4) //Adds the line to the dataSet
-        sensorLineChart.addDataSet(line5) //Adds the line to the dataSet
-        sensorLineChart.addDataSet(line6) //Adds the line to the dataSet
+        sensorLineChart.addDataSet(line1) //Adds the lines to the dataSet
+        sensorLineChart.addDataSet(line2)
+        sensorLineChart.addDataSet(line3)
+        sensorLineChart.addDataSet(line4)
+        sensorLineChart.addDataSet(line5)
+        sensorLineChart.addDataSet(line6)
         
         return sensorLineChart
     }
     func addCurve(curveName : [Double], timestamps : [Double], label : String, color : NSUIColor) -> LineChartDataSet {
         
         var lineChartEntry  = [ChartDataEntry]() //this is the Array that will eventually be displayed on the graph.
-        
         //here is the for loop
         for i in 0..<curveName.count {
-            
             let value = ChartDataEntry(x: timestamps[i], y: curveName[i]) // here we set the X and Y status in a data chart entry
             lineChartEntry.append(value) // here we add it to the data set
         }
-        
         let line1 = LineChartDataSet(entries: lineChartEntry, label: label) //Here we convert lineChartEntry to a LineChartDataSet
         line1.colors = [color] //Sets the colour to blue
         line1.drawCirclesEnabled = false
-        
         return line1
     }
 }
@@ -216,9 +215,8 @@ class activity{
     
     init(){
         self.aggregatedData=[]
-        let fileStartRecordTimeStamp = getCurrentTimeStamp()
-        self.accel = SensorData(initLogFileName:"accel_" + fileStartRecordTimeStamp + ".csv")
-        self.gyro = SensorData(initLogFileName:"gyro_" + fileStartRecordTimeStamp + ".csv")
+        self.accel = SensorData(initDataType:"accel")
+        self.gyro = SensorData(initDataType:"gyro")
     }
     
     func returnSensorDimension(name:String)->[Double] {
