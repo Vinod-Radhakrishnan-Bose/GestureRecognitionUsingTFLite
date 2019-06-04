@@ -46,25 +46,8 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     @IBOutlet weak var confidenceLabel: UILabel!
         
     @IBOutlet weak var startStopButton: UIButton!
-    /*var fileNameAccel = ""
-    var fileURLAccel:URL? = nil
-    var firstWriteToAccelFile:Bool = true
-    
-    var fileNameGyro = ""
-    var fileURLGyro:URL? = nil
-    var firstWriteToGyroFile:Bool = true
-    
-    var fileNameRoto = ""
-    var fileURLRoto:URL? = nil
-    var firstWriteToRotoFile:Bool = true*/
     
     var dataCollectionStaretd:Bool = false
-    
-    
-    let S3BucketName = "contextual-hearing"
-    
-    var fileStartRecordTimeStamp:String = ""
-    var fileStopRecordTimeStamp:String = ""
     
     var recordWavFileOnly:Bool = false
     var recordingSession:AVAudioSession!
@@ -374,34 +357,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         self.active.aggregatedData=[]
     }
     
-    /*func setUpDataCollectionLogFiles()  {
-        
-        // Instead of getting file name from the text field, it needs to come from the options displayed. Once the user has clicked on an activity, example: Walking, the text 'walking' should be in the file name in place of fileNameTextField.text
-        // Remove the FileName textbox and just use the label of the button clicked. 
-        
-        let fileManager = FileManager.default
-        let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
-        let documentDirectory = urls[0] as NSURL
-        let inputText = "Dummy"
-        
-        fileNameAccel = inputText + "_"  + "_Accel_" + fileStartRecordTimeStamp + ".csv"
-        fileNameGyro  = inputText + "_" +  "_Gyro_" +  fileStartRecordTimeStamp + ".csv"
-       //fileNameRoto  = activityLabel.text! + "_Roto_" +  fileStartRecordTimeStamp + ".csv"
-        
-        fileURLAccel = documentDirectory.appendingPathComponent(fileNameAccel)
-        fileURLGyro = documentDirectory.appendingPathComponent(fileNameGyro)
-        //fileURLRoto = documentDirectory.appendingPathComponent(fileNameRoto)
-        
-        firstWriteToAccelFile = true
-        writeAccelDataCollectionFileHeader()
-        
-        firstWriteToGyroFile = true
-        writeGyroDataCollectionFileHeader()
-        
-        firstWriteToRotoFile = true
-       // writeRotoDataCollectionFileHeader()
-    }*/
-    
     func getCurrentTimeStamp() -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "HH-mm-ss-SSS, yyyy-MM-dd"
@@ -609,7 +564,6 @@ extension DataCollectionViewController: WearableDeviceSessionDelegate {
         AudioServicesPlaySystemSound(self.systemSoundID)
         self.startStopButton.backgroundColor = .red
         self.startStopButton.setTitle("Stop Recording", for: .normal)
-        self.fileStartRecordTimeStamp = self.getCurrentTimeStamp()
         self.dataCollectionStaretd = true
         self.active.flushDataBuffers()
         self.startTimer()
