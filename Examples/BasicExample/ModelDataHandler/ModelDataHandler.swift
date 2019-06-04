@@ -75,8 +75,6 @@ class ModelDataHandler {
             fatalError("Invalid Sig Def YAML file. Try again.")
         }
     }
-    // Aayush: prediction algorithm
-    //This is a recursive function that defines the prediction flow. X, Y and Z buffers get data continuously, but we only take the last 80 elements for the real time prediction. (Frames are caliberated at 25Hz, hence buffer takes 3.2 seconds to get filled up. (25 * 3.2 = 80). all axis data is stored in a single buffer with shape (1,240), which gets passed to mlMultiArray. Prediction happens with this data. After 4 seconds the function is self called for the second prediction.
     
     func predictActivity(aggregatedData:[Double]) -> (String, String) {
         

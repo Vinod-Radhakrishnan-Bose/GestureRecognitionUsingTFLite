@@ -153,8 +153,8 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             
             // Enable the rotation and accelerometer sensors
             //config.enable(sensor: .rotation, at: ._40ms)
-            config.enable(sensor: .gyroscope, at: ._40ms)
-            config.enable(sensor: .accelerometer, at: ._40ms)
+            config.enable(sensor: .gyroscope, at: ._10ms)
+            config.enable(sensor: .accelerometer, at: ._10ms)
         }
     }
     
@@ -266,20 +266,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     {
         self.active.aggregatedData=[]
     }
-    
-    func getCurrentTimeStamp() -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "HH-mm-ss-SSS, yyyy-MM-dd"
-        
-        let dataString:String =  formatter.string(from: Date())
-        return dataString
-    }
-    
-        // MARK: - table View
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
 }
 
 // MARK: - SensorDispatchHandler
@@ -327,14 +313,6 @@ extension DataCollectionViewController: SensorDispatchHandler {
                 GyroData += "\(String(describing: gyroData.rotationRate.z)) \n"
                 active.gyro.writeToLogFile(txt: GyroData)
             }
-
-            var normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "gyro_x")
-            vector_local.x /= normalization_factor
-            normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "gyro_y")
-            vector_local.y /= normalization_factor
-            normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "gyro_z")
-            vector_local.z /= normalization_factor
-
             active.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, modelDataHandler: modelDataHandler!)
         }
     }
