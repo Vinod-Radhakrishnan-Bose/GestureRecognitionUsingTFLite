@@ -6,6 +6,7 @@
 //  Copyright © 2019 Bose Corporation. All rights reserved.
 //
 import UIKit
+import BoseWearable
 
 /// A result from invoking the `Interpreter`.
 struct SensorData {
@@ -101,6 +102,62 @@ struct SensorData {
         
         return dataHeader
     }
+    
+    mutating func appendSensorData(timeStamp:SensorTimestamp, vector:Vector, model_sample_period:Int) {
+        var unwrappedTimeStamp:Int64 = 0
+        var timeStampDelta = 0
+        let millisecToSec = 0.001
+        
+        if self.prevDataTimeStamp == 0 &&
+            self.maxDataTimeStamp == 0 {
+            self.prevDataTimeStamp = timeStamp
+        }
+        if timeStamp < self.prevDataTimeStamp {
+            // Handle wraparounds
+            self.maxDataTimeStamp += Int64(65536)
+            timeStampDelta = Int(round(Double(Int(timeStamp) + 65535 - Int(self.prevDataTimeStamp))/Double(model_sample_period)))
+        }
+        else {
+            timeStampDelta = Int(round(Double(Int(timeStamp) - Int(self.prevDataTimeStamp))/Double(model_sample_period)))
+        }
+        if (timeStampDelta > 10) {
+            /*stopDataCollection()
+            startDataCollection()*/
+        }
+        else {
+            for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
+                let timeStampBase = self.maxDataTimeStamp + Int64(self.prevDataTimeStamp)
+                self.dataTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
+                let scale = Double(index)/Double(timeStampDelta)
+                let lastX : Double = self.dataX.last ?? 0.0
+                let lastY : Double = self.dataY.last ?? 0.0
+                let lastZ : Double = self.dataZ.last ?? 0.0
+                self.dataX.append(lastX + scale * (vector.x - lastX))
+                self.dataY.append(lastY + scale * (vector.y - lastY))
+                self.dataZ.append(lastZ + scale * (vector.z - lastZ))
+                self.interpolatedDataX.append(lastX + scale * (vector.x - lastX))
+                self.interpolatedDataY.append(lastY + scale * (vector.y - lastY))
+                self.interpolatedDataZ.append(lastZ + scale * (vector.z - lastZ))
+            }
+            unwrappedTimeStamp = Int64(timeStamp) + self.maxDataTimeStamp
+            self.prevDataTimeStamp = timeStamp
+            self.dataTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
+            //Buffer stores x, y and z accelerometer data from frames.
+            self.dataX.append(vector.x)
+            self.dataY.append(vector.y)
+            self.dataZ.append(vector.z)
+            self.interpolatedDataX.append(0.0)
+            self.interpolatedDataY.append(0.0)
+            self.interpolatedDataZ.append(0.0)
+            self.dataX = self.dataX.suffix(240)
+            self.dataY = self.dataY.suffix(240)
+            self.dataZ = self.dataZ.suffix(240)
+            self.dataTimeStamp = self.dataTimeStamp.suffix(240)
+            self.interpolatedDataX = self.interpolatedDataX.suffix(240)
+            self.interpolatedDataY = self.interpolatedDataY.suffix(240)
+            self.interpolatedDataZ = self.interpolatedDataZ.suffix(240)
+        }
+    }
 }
 
 class activity{
@@ -135,6 +192,10 @@ class activity{
             array = []
         }
         return array
+    }
+    func flushDataBuffers() {
+        self.accel.flushSensorData()
+        self.gyro.flushSensorData()
     }
 }
 

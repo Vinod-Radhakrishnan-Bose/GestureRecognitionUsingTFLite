@@ -472,7 +472,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
             normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_z")
             vector_local.z /= normalization_factor
             
-            active.accel = appendSensorData(sensorData:active.accel, timeStamp:timestamp, vector:vector_local)
+            active.accel.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: model_sample_period)
 
         }
     }
@@ -502,66 +502,8 @@ extension DataCollectionViewController: SensorDispatchHandler {
             normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_z")
             vector_local.z /= normalization_factor
 
-            active.gyro = appendSensorData(sensorData:active.gyro, timeStamp:timestamp, vector:vector_local)
+            active.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: model_sample_period)
         }
-    }
-    
-    func appendSensorData(sensorData:SensorData, timeStamp:SensorTimestamp, vector:Vector) -> SensorData {
-        var unwrappedTimeStamp:Int64 = 0
-        var timeStampDelta = 0
-        let millisecToSec = 0.001
-        var localSensorData = sensorData
-        
-        if localSensorData.prevDataTimeStamp == 0 &&
-           localSensorData.maxDataTimeStamp == 0 {
-           localSensorData.prevDataTimeStamp = timeStamp
-        }
-        if timeStamp < sensorData.prevDataTimeStamp {
-            // Handle wraparounds
-            active.accel.maxDataTimeStamp += Int64(65536)
-            timeStampDelta = Int(round(Double(Int(timeStamp) + 65535 - Int(localSensorData.prevDataTimeStamp))/Double(model_sample_period)))
-        }
-        else {
-            timeStampDelta = Int(round(Double(Int(timeStamp) - Int(localSensorData.prevDataTimeStamp))/Double(model_sample_period)))
-        }
-        if (timeStampDelta > 10) {
-            stopDataCollection()
-            startDataCollection()
-        }
-        else {
-            for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
-                let timeStampBase = localSensorData.maxDataTimeStamp + Int64(localSensorData.prevDataTimeStamp)
-                localSensorData.dataTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
-                let scale = Double(index)/Double(timeStampDelta)
-                let lastX : Double = localSensorData.dataX.last ?? 0.0
-                let lastY : Double = localSensorData.dataY.last ?? 0.0
-                let lastZ : Double = localSensorData.dataZ.last ?? 0.0
-                localSensorData.dataX.append(lastX + scale * (vector.x - lastX))
-                localSensorData.dataY.append(lastY + scale * (vector.y - lastY))
-                localSensorData.dataZ.append(lastZ + scale * (vector.z - lastZ))
-                localSensorData.interpolatedDataX.append(lastX + scale * (vector.x - lastX))
-                localSensorData.interpolatedDataY.append(lastY + scale * (vector.y - lastY))
-                localSensorData.interpolatedDataZ.append(lastZ + scale * (vector.z - lastZ))
-            }
-            unwrappedTimeStamp = Int64(timeStamp) + localSensorData.maxDataTimeStamp
-            localSensorData.prevDataTimeStamp = timeStamp
-            localSensorData.dataTimeStamp.append(Double(unwrappedTimeStamp) * millisecToSec)
-            //Buffer stores x, y and z accelerometer data from frames.
-            localSensorData.dataX.append(vector.x)
-            localSensorData.dataY.append(vector.y)
-            localSensorData.dataZ.append(vector.z)
-            localSensorData.interpolatedDataX.append(0.0)
-            localSensorData.interpolatedDataY.append(0.0)
-            localSensorData.interpolatedDataZ.append(0.0)
-            localSensorData.dataX = localSensorData.dataX.suffix(240)
-            localSensorData.dataY = localSensorData.dataY.suffix(240)
-            localSensorData.dataZ = localSensorData.dataZ.suffix(240)
-            localSensorData.dataTimeStamp = localSensorData.dataTimeStamp.suffix(240)
-            localSensorData.interpolatedDataX = localSensorData.interpolatedDataX.suffix(240)
-            localSensorData.interpolatedDataY = localSensorData.interpolatedDataY.suffix(240)
-            localSensorData.interpolatedDataZ = localSensorData.interpolatedDataZ.suffix(240)
-        }
-        return localSensorData
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?){
@@ -653,12 +595,7 @@ extension DataCollectionViewController: WearableDeviceSessionDelegate {
         
         return line1
     }
-    
-    func flushDataBuffers() {
-        self.active.accel.flushSensorData()
-        self.active.gyro.flushSensorData()
-    }
-    
+        
     func stopDataCollection() {
         dataCollectionStaretd = false
         startStopButton.setTitle("Start Recording", for: .normal)
@@ -673,9 +610,8 @@ extension DataCollectionViewController: WearableDeviceSessionDelegate {
         self.startStopButton.backgroundColor = .red
         self.startStopButton.setTitle("Stop Recording", for: .normal)
         self.fileStartRecordTimeStamp = self.getCurrentTimeStamp()
-        //self.setUpDataCollectionLogFiles()
         self.dataCollectionStaretd = true
-        self.flushDataBuffers()
+        self.active.flushDataBuffers()
         self.startTimer()
     }
 }
