@@ -25,6 +25,7 @@ struct SensorData {
     var interpolatedDataZ:[Double] // Z-dimension interpolated data.
     var logFileName = "" // Filename for logging sensor data
     var logFileURL:URL? = nil
+    var sensorType:String=""
     
     private var firstWriteToLogFile:Bool = true
     
@@ -104,11 +105,19 @@ struct SensorData {
         return dataHeader
     }
     
-    mutating func appendSensorData(timeStamp:SensorTimestamp, vector:Vector, model_sample_period:Int) {
+    mutating func appendSensorData(timeStamp:SensorTimestamp, vector:Vector, modelDataHandler:ModelDataHandler) {
         var unwrappedTimeStamp:Int64 = 0
         var timeStampDelta = 0
         let millisecToSec = 0.001
-        
+        var vector_local = vector
+        // Normalize accelerometer values
+        var normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: logFileName + "x")
+        vector_local.x /= normalization_factor
+        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: logFileName + "y")
+        vector_local.y /= normalization_factor
+        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: logFileName + "z")
+        vector_local.z /= normalization_factor
+
         if self.prevDataTimeStamp == 0 &&
             self.maxDataTimeStamp == 0 {
             self.prevDataTimeStamp = timeStamp
@@ -116,10 +125,10 @@ struct SensorData {
         if timeStamp < self.prevDataTimeStamp {
             // Handle wraparounds
             self.maxDataTimeStamp += Int64(65536)
-            timeStampDelta = Int(round(Double(Int(timeStamp) + 65535 - Int(self.prevDataTimeStamp))/Double(model_sample_period)))
+            timeStampDelta = Int(round(Double(Int(timeStamp) + 65535 - Int(self.prevDataTimeStamp))/Double(modelDataHandler.model_sample_period)))
         }
         else {
-            timeStampDelta = Int(round(Double(Int(timeStamp) - Int(self.prevDataTimeStamp))/Double(model_sample_period)))
+            timeStampDelta = Int(round(Double(Int(timeStamp) - Int(self.prevDataTimeStamp))/Double(modelDataHandler.model_sample_period)))
         }
         if (timeStampDelta > 10) {
             /*stopDataCollection()
@@ -128,7 +137,7 @@ struct SensorData {
         else {
             for index in stride(from: 1, through: timeStampDelta-1, by: 1) {
                 let timeStampBase = self.maxDataTimeStamp + Int64(self.prevDataTimeStamp)
-                self.dataTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(model_sample_period)) * millisecToSec)
+                self.dataTimeStamp.append(Double(timeStampBase + Int64(index) * Int64(modelDataHandler.model_sample_period)) * millisecToSec)
                 let scale = Double(index)/Double(timeStampDelta)
                 let lastX : Double = self.dataX.last ?? 0.0
                 let lastY : Double = self.dataY.last ?? 0.0
@@ -207,8 +216,8 @@ class activity{
     init(){
         self.aggregatedData=[]
         let fileStartRecordTimeStamp = getCurrentTimeStamp()
-        self.accel = SensorData(initLogFileName:"Accel_" + fileStartRecordTimeStamp + ".csv")
-        self.gyro = SensorData(initLogFileName:"Gyro_" + fileStartRecordTimeStamp + ".csv")
+        self.accel = SensorData(initLogFileName:"accel_" + fileStartRecordTimeStamp + ".csv")
+        self.gyro = SensorData(initLogFileName:"gyro_" + fileStartRecordTimeStamp + ".csv")
     }
     
     func returnSensorDimension(name:String)->[Double] {

@@ -317,28 +317,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         return 1
     }
     
-    
-    /*func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return wavFileNameList.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell")! //1.
-        
-        let text = wavFileNameList[indexPath.row] //2.
-        
-        cell.textLabel?.text = text //3.
-        
-        return cell //4.
-    }
-    
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
-        print("Index Selected \(indexPath.row)")
-        
-        wavTableCellSelected = indexPath.row
-    }*/
-    
 }
 
 // MARK: - SensorDispatchHandler
@@ -351,7 +329,6 @@ extension DataCollectionViewController: SensorDispatchHandler {
     
     
     func receivedAccelerometer(vector: Vector, accuracy: VectorAccuracy, timestamp: SensorTimestamp) {
-        var vector_local = vector
         if(dataCollectionStaretd)
         {
             var AccelData:String = ""
@@ -365,16 +342,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
                 AccelData += "\(String(describing: accelerometerData.acceleration.z)) \n"
                 active.accel.writeToLogFile(txt: AccelData)
             }
-            
-            // Normalize accelerometer values
-            var normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "accel_x")
-            vector_local.x /= normalization_factor
-            normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "accel_y")
-            vector_local.y /= normalization_factor
-            normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "accel_z")
-            vector_local.z /= normalization_factor
-            
-            active.accel.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: modelDataHandler!.model_sample_period)
+            active.accel.appendSensorData(timeStamp:timestamp, vector:vector, modelDataHandler: modelDataHandler!)
 
         }
     }
@@ -404,7 +372,7 @@ extension DataCollectionViewController: SensorDispatchHandler {
             normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "gyro_z")
             vector_local.z /= normalization_factor
 
-            active.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: modelDataHandler!.model_sample_period)
+            active.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, modelDataHandler: modelDataHandler!)
         }
     }
 
