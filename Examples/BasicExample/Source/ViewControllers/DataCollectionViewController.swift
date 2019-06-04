@@ -73,10 +73,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         motionManager.startGyroUpdates()
         motionManager.startMagnetometerUpdates()
 
-        //guard let fileURL = Bundle.main.url(forResource: "model_config_activity_recognition", withExtension: "yml") else {
-        guard let fileURL = Bundle.main.url(forResource: "look_left_look_up_model_config", withExtension: "yml") else {
-            fatalError("Sig Def YAML file not found in bundle. Please add and try again.")
-        }
         do {
             modelDataHandler =
                 ModelDataHandler(configFileName: "look_left_look_up_model_config.yml")
@@ -269,15 +265,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         predictionLabel.text = result?.inferences[0].label//prediction?.classLabel
         confidenceLabel.text = String(describing : Int16((result?.inferences[0].confidence ?? 0.0) * 100.0)) + "%\n"
     }
-
-    func returnSensorDimensionNormalizationValue(name:String)->Double {
-        let index = modelDataHandler!.sensor_dimension_ordering.lastIndex(of: name)
-        if index != nil {
-            return modelDataHandler!.normalization_value[index!]
-        } else {
-            return 1.0
-        }
-    }
     
     @IBAction func emailData(_ sender: Any) {
         
@@ -380,11 +367,11 @@ extension DataCollectionViewController: SensorDispatchHandler {
             }
             
             // Normalize accelerometer values
-            var normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_x")
+            var normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "accel_x")
             vector_local.x /= normalization_factor
-            normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_y")
+            normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "accel_y")
             vector_local.y /= normalization_factor
-            normalization_factor = returnSensorDimensionNormalizationValue(name: "accel_z")
+            normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "accel_z")
             vector_local.z /= normalization_factor
             
             active.accel.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: modelDataHandler!.model_sample_period)
@@ -410,11 +397,11 @@ extension DataCollectionViewController: SensorDispatchHandler {
                 active.gyro.writeToLogFile(txt: GyroData)
             }
 
-            var normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_x")
+            var normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "gyro_x")
             vector_local.x /= normalization_factor
-            normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_y")
+            normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "gyro_y")
             vector_local.y /= normalization_factor
-            normalization_factor = returnSensorDimensionNormalizationValue(name: "gyro_z")
+            normalization_factor = modelDataHandler!.returnSensorDimensionNormalizationValue(name: "gyro_z")
             vector_local.z /= normalization_factor
 
             active.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, model_sample_period: modelDataHandler!.model_sample_period)

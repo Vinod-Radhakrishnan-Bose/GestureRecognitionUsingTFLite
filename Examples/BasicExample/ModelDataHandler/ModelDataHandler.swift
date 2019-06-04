@@ -135,6 +135,15 @@ class ModelDataHandler {
         // Return the `Inference` results.
         return sortedResults.map { result in Inference(confidence: result.1, label: labels[result.0]) }
     }
+
+    func returnSensorDimensionNormalizationValue(name:String)->Double {
+        let index = sensor_dimension_ordering.lastIndex(of: name)
+        if index != nil {
+            return normalization_value[index!]
+        } else {
+            return 1.0
+        }
+    }
 }
 extension Array {
     /// Creates a new array from the bytes of the given unsafe data.
