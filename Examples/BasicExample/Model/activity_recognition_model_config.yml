@@ -1,5 +1,5 @@
-labels_filename: labels_activity_recognition.txt
-model_filename: TFKerasModel_to_TFlite_activity_recognition.tflite
+labels_filename: activity_recognition_labels.txt
+model_filename: activity_recognition_model.tflite
 num_results: 1
 data_format:
   num_values_per_sensor_dimenion: 80

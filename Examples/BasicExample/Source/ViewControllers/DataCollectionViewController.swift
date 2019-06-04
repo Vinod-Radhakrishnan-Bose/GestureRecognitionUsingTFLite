@@ -115,7 +115,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         motionManager.startMagnetometerUpdates()
 
         //guard let fileURL = Bundle.main.url(forResource: "model_config_activity_recognition", withExtension: "yml") else {
-        guard let fileURL = Bundle.main.url(forResource: "model_config_look_up_look_left", withExtension: "yml") else {
+        guard let fileURL = Bundle.main.url(forResource: "look_left_look_up_model_config", withExtension: "yml") else {
             fatalError("Sig Def YAML file not found in bundle. Please add and try again.")
         }
         do {

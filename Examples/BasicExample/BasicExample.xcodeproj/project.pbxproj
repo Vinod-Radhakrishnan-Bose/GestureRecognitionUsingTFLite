@@ -7,16 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2466ABD022A53B290060019E /* model_config_activity_recognition.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABCF22A53B290060019E /* model_config_activity_recognition.yml */; };
-		2466ABD222A586E70060019E /* model_config_look_up_look_left.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABD122A586E70060019E /* model_config_look_up_look_left.yml */; };
+		2466ABD022A53B290060019E /* activity_recognition_model_config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */; };
+		2466ABD222A586E70060019E /* look_left_look_up_model_config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABD122A586E70060019E /* look_left_look_up_model_config.yml */; };
 		248BBE7B22A03FED003856C5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 248BBE7922A03FED003856C5 /* Main.storyboard */; };
 		24B7D30A229EB1EE00BC36B0 /* ActivityData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D309229EB1DA00BC36B0 /* ActivityData.swift */; };
 		24B7D30E229EB3F100BC36B0 /* DataCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D30D229EB3F100BC36B0 /* DataCollectionViewController.swift */; };
 		24B7D318229EB7BD00BC36B0 /* ModelDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D314229EB7BD00BC36B0 /* ModelDataHandler.swift */; };
-		24B7D319229EB7BD00BC36B0 /* TFKerasModel_to_TFlite_activity_recognition.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D316229EB7BD00BC36B0 /* TFKerasModel_to_TFlite_activity_recognition.tflite */; };
-		24B7D31A229EB7BD00BC36B0 /* labels_activity_recognition.txt in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D317229EB7BD00BC36B0 /* labels_activity_recognition.txt */; };
-		24B7D31D229EC12200BC36B0 /* look_left_look_up.txt in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D31B229EC12200BC36B0 /* look_left_look_up.txt */; };
-		24B7D31E229EC12200BC36B0 /* TFKerasModel_to_TFlite_look_left_look_up.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D31C229EC12200BC36B0 /* TFKerasModel_to_TFlite_look_left_look_up.tflite */; };
+		24B7D319229EB7BD00BC36B0 /* activity_recognition_model.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D316229EB7BD00BC36B0 /* activity_recognition_model.tflite */; };
+		24B7D31A229EB7BD00BC36B0 /* activity_recognition_labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D317229EB7BD00BC36B0 /* activity_recognition_labels.txt */; };
+		24B7D31D229EC12200BC36B0 /* look_left_look_up_labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D31B229EC12200BC36B0 /* look_left_look_up_labels.txt */; };
+		24B7D31E229EC12200BC36B0 /* look_left_look_up_model.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 24B7D31C229EC12200BC36B0 /* look_left_look_up_model.tflite */; };
 		45D954980A68A8B7BB520C8C /* Pods_BasicExample.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DCA6C89F41AF02954166DD91 /* Pods_BasicExample.framework */; };
 		C5649B7B222F17D800838BD1 /* SuspensionOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5649B7A222F17D700838BD1 /* SuspensionOverlay.swift */; };
 		C568AC3C21AC6D9F00FFE42E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = C568AC3B21AC6D9F00FFE42E /* AppDelegate.swift */; };
@@ -43,16 +43,16 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		2466ABCF22A53B290060019E /* model_config_activity_recognition.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = model_config_activity_recognition.yml; sourceTree = "<group>"; };
-		2466ABD122A586E70060019E /* model_config_look_up_look_left.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = model_config_look_up_look_left.yml; sourceTree = "<group>"; };
+		2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = activity_recognition_model_config.yml; sourceTree = "<group>"; };
+		2466ABD122A586E70060019E /* look_left_look_up_model_config.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = look_left_look_up_model_config.yml; sourceTree = "<group>"; };
 		248BBE7A22A03FED003856C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		24B7D309229EB1DA00BC36B0 /* ActivityData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ActivityData.swift; sourceTree = "<group>"; };
 		24B7D30D229EB3F100BC36B0 /* DataCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataCollectionViewController.swift; sourceTree = "<group>"; };
 		24B7D314229EB7BD00BC36B0 /* ModelDataHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModelDataHandler.swift; sourceTree = "<group>"; };
-		24B7D316229EB7BD00BC36B0 /* TFKerasModel_to_TFlite_activity_recognition.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = TFKerasModel_to_TFlite_activity_recognition.tflite; sourceTree = "<group>"; };
-		24B7D317229EB7BD00BC36B0 /* labels_activity_recognition.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = labels_activity_recognition.txt; sourceTree = "<group>"; };
-		24B7D31B229EC12200BC36B0 /* look_left_look_up.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = look_left_look_up.txt; sourceTree = "<group>"; };
-		24B7D31C229EC12200BC36B0 /* TFKerasModel_to_TFlite_look_left_look_up.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = TFKerasModel_to_TFlite_look_left_look_up.tflite; sourceTree = "<group>"; };
+		24B7D316229EB7BD00BC36B0 /* activity_recognition_model.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = activity_recognition_model.tflite; sourceTree = "<group>"; };
+		24B7D317229EB7BD00BC36B0 /* activity_recognition_labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = activity_recognition_labels.txt; sourceTree = "<group>"; };
+		24B7D31B229EC12200BC36B0 /* look_left_look_up_labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = look_left_look_up_labels.txt; sourceTree = "<group>"; };
+		24B7D31C229EC12200BC36B0 /* look_left_look_up_model.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = look_left_look_up_model.tflite; sourceTree = "<group>"; };
 		515CC38D1A66C0818C8AEB40 /* Pods-BasicExample.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BasicExample.release.xcconfig"; path = "Pods/Target Support Files/Pods-BasicExample/Pods-BasicExample.release.xcconfig"; sourceTree = "<group>"; };
 		C5649B7A222F17D700838BD1 /* SuspensionOverlay.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SuspensionOverlay.swift; sourceTree = "<group>"; };
 		C568AC3821AC6D9F00FFE42E /* BasicExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BasicExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -92,12 +92,12 @@
 		24B7D315229EB7BD00BC36B0 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				2466ABCF22A53B290060019E /* model_config_activity_recognition.yml */,
-				2466ABD122A586E70060019E /* model_config_look_up_look_left.yml */,
-				24B7D316229EB7BD00BC36B0 /* TFKerasModel_to_TFlite_activity_recognition.tflite */,
-				24B7D31C229EC12200BC36B0 /* TFKerasModel_to_TFlite_look_left_look_up.tflite */,
-				24B7D317229EB7BD00BC36B0 /* labels_activity_recognition.txt */,
-				24B7D31B229EC12200BC36B0 /* look_left_look_up.txt */,
+				2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */,
+				2466ABD122A586E70060019E /* look_left_look_up_model_config.yml */,
+				24B7D316229EB7BD00BC36B0 /* activity_recognition_model.tflite */,
+				24B7D31C229EC12200BC36B0 /* look_left_look_up_model.tflite */,
+				24B7D317229EB7BD00BC36B0 /* activity_recognition_labels.txt */,
+				24B7D31B229EC12200BC36B0 /* look_left_look_up_labels.txt */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -264,14 +264,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				248BBE7B22A03FED003856C5 /* Main.storyboard in Resources */,
-				24B7D319229EB7BD00BC36B0 /* TFKerasModel_to_TFlite_activity_recognition.tflite in Resources */,
-				24B7D31D229EC12200BC36B0 /* look_left_look_up.txt in Resources */,
-				24B7D31A229EB7BD00BC36B0 /* labels_activity_recognition.txt in Resources */,
-				2466ABD022A53B290060019E /* model_config_activity_recognition.yml in Resources */,
+				24B7D319229EB7BD00BC36B0 /* activity_recognition_model.tflite in Resources */,
+				24B7D31D229EC12200BC36B0 /* look_left_look_up_labels.txt in Resources */,
+				24B7D31A229EB7BD00BC36B0 /* activity_recognition_labels.txt in Resources */,
+				2466ABD022A53B290060019E /* activity_recognition_model_config.yml in Resources */,
 				C568AC5B21AC6E2F00FFE42E /* Assets.xcassets in Resources */,
 				C568AC5C21AC6E2F00FFE42E /* LaunchScreen.storyboard in Resources */,
-				24B7D31E229EC12200BC36B0 /* TFKerasModel_to_TFlite_look_left_look_up.tflite in Resources */,
-				2466ABD222A586E70060019E /* model_config_look_up_look_left.yml in Resources */,
+				24B7D31E229EC12200BC36B0 /* look_left_look_up_model.tflite in Resources */,
+				2466ABD222A586E70060019E /* look_left_look_up_model_config.yml in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
