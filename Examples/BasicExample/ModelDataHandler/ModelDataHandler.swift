@@ -31,7 +31,7 @@ class ModelDataHandler {
     
     // MARK: - Public Properties
     var resultCount = 1 // Number of results to report
-    var numValuesPerSensorDim = 100 // Number of values per sensor-dimension (i.e. number of values of accel-x, number of values of accel-y etc.)
+    var numSamplesPerSensorDim = 100 // Number of values per sensor-dimension (i.e. number of values of accel-x, number of values of accel-y etc.)
     var sensorDimOrdering:[String] = [] // How should data be formatted before invoking model (for ex. <-- accel_x array ---> <--- accel-y array> etc.
     var sensorDimNormalization:[Double] = [] // Normalization values used for each data dimension
     var modelSamplePeriod:Int = 20 // Sample period which was used for model training in ms
@@ -58,10 +58,9 @@ class ModelDataHandler {
             resultCount = configuration["num_results"].int!
             let modelInfo:FileInfo = (name:configuration["model_filename"].string!, extension:"")
             let labelInfo:FileInfo = (name:configuration["labels_filename"].string!, extension:"")
-            interpreter = loadModel(modelFileInfo: modelInfo, labelsFileInfo: labelInfo ,
-            configuredResultCount: resultCount)!
+            interpreter = loadModel(modelFileInfo: modelInfo, configuredResultCount: resultCount)!
             
-            numValuesPerSensorDim = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
+            numSamplesPerSensorDim = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
             for index in 0..<configuration["data_format"]["sensor_dimension_ordering"].count! {
                 let sensorDim = configuration["data_format"]["sensor_dimension_ordering"][index].string!
                 sensorDimOrdering.append(sensorDim)
@@ -84,10 +83,9 @@ class ModelDataHandler {
         // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
         let result = runModel(input: Data(buffer: UnsafeBufferPointer(start: sensorDataBytes, count: sensorDataBytes.count)))
         //Changing the text of the predictionLabel
-        let predictionLabel = result!.inferences[0].label//prediction?.classLabel
-        let confidenceLabel = String(describing : Int16((result!.inferences[0].confidence) * 100.0)) + "%\n"
-        
-        return (predictionLabel, confidenceLabel)
+        let predictionLabel = result?.inferences[0].label//prediction?.classLabel
+        let confidenceLabel = String(describing : Int16((result?.inferences[0].confidence) ?? 0.0 * 100.0)) + "%\n"
+        return (predictionLabel ?? "", confidenceLabel)
     }
     
     func runModel(input: Data) -> Result? {
@@ -132,6 +130,10 @@ class ModelDataHandler {
         }
         
         // Process the results.
+        if results.count != labels.count {
+            print("Output tensor length does not match label length")
+            return nil
+        }
         let topNInferences = getTopN(results: results)
         
         // Return the inference time and inference results.
@@ -183,7 +185,7 @@ extension Array {
     }
 }
 
-func loadModel(modelFileInfo: FileInfo, labelsFileInfo: FileInfo, threadCount: Int = 1, configuredResultCount: Int = 3) -> Interpreter? {
+func loadModel(modelFileInfo: FileInfo, threadCount: Int = 1, configuredResultCount: Int = 3) -> Interpreter? {
     let modelFilename = modelFileInfo.name
     var interpreter : Interpreter
     // Construct the path to the model file.
@@ -218,7 +220,8 @@ func loadLabels(fileInfo: FileInfo) -> [String] {
             "\(filename).\(fileExtension) and try again.")
     }
     do {
-        let contents = try String(contentsOf: fileURL, encoding: .utf8)
+        var contents = try String(contentsOf: fileURL, encoding: .utf8)
+        contents = contents.trimmingCharacters(in: .newlines)
         return contents.components(separatedBy: .newlines)
     } catch {
         fatalError("Labels file named \(filename).\(fileExtension) cannot be read. Please add a " +

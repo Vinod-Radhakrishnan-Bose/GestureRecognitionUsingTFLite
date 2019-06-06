@@ -213,7 +213,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         
         // perform inferencing every 4 seconds
         if counter % 4 == 0 {
-            deviceData.aggregateData(sensorDimOrdering: modelDataHandler!.sensorDimOrdering, numValuesPerSensorDim: modelDataHandler!.numValuesPerSensorDim)
+            deviceData.aggregateData(sensorDimOrdering: modelDataHandler!.sensorDimOrdering, numSamplesPerSensorDim: modelDataHandler!.numSamplesPerSensorDim)
             let (prediction_label, prediction_confidence) = modelDataHandler!.predictActivity(aggregatedData: deviceData.aggregatedData)
             predictionLabel.text = prediction_label
             confidenceLabel.text = prediction_confidence
