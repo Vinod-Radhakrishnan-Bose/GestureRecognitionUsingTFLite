@@ -85,7 +85,7 @@ class ModelDataHandler {
         //Changing the text of the predictionLabel
         let predictionLabel = result?.inferences[0].label//prediction?.classLabel
         let confidenceLabel = String(describing : Int16((result?.inferences[0].confidence) ?? 0.0 * 100.0)) + "%\n"
-        return (predictionLabel ?? "", confidenceLabel)
+        return (predictionLabel ?? "Error", confidenceLabel)
     }
     
     func runModel(input: Data) -> Result? {
