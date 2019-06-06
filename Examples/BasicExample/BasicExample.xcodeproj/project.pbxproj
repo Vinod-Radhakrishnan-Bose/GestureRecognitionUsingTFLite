@@ -16,6 +16,9 @@
 		2466ABDE22A80CD30060019E /* nine_gestures_model_config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABDB22A80CD20060019E /* nine_gestures_model_config.yml */; };
 		2466ABE022A80CD30060019E /* nine_gestures_labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABDD22A80CD30060019E /* nine_gestures_labels.txt */; };
 		2466ABE322A813EF0060019E /* nine_gestures_model.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABE222A813EF0060019E /* nine_gestures_model.tflite */; };
+		2466ABE722A9930B0060019E /* look_LRUD_model_config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABE422A9930A0060019E /* look_LRUD_model_config.yml */; };
+		2466ABE822A9930B0060019E /* look_LRUD_model.tflite in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABE522A9930B0060019E /* look_LRUD_model.tflite */; };
+		2466ABE922A9930B0060019E /* look_LRUD_labels.txt in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABE622A9930B0060019E /* look_LRUD_labels.txt */; };
 		248BBE7B22A03FED003856C5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 248BBE7922A03FED003856C5 /* Main.storyboard */; };
 		24B7D30A229EB1EE00BC36B0 /* SensorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D309229EB1DA00BC36B0 /* SensorData.swift */; };
 		24B7D30E229EB3F100BC36B0 /* DataCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24B7D30D229EB3F100BC36B0 /* DataCollectionViewController.swift */; };
@@ -59,6 +62,9 @@
 		2466ABDB22A80CD20060019E /* nine_gestures_model_config.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nine_gestures_model_config.yml; sourceTree = "<group>"; };
 		2466ABDD22A80CD30060019E /* nine_gestures_labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = nine_gestures_labels.txt; sourceTree = "<group>"; };
 		2466ABE222A813EF0060019E /* nine_gestures_model.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = nine_gestures_model.tflite; sourceTree = "<group>"; };
+		2466ABE422A9930A0060019E /* look_LRUD_model_config.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = look_LRUD_model_config.yml; sourceTree = "<group>"; };
+		2466ABE522A9930B0060019E /* look_LRUD_model.tflite */ = {isa = PBXFileReference; lastKnownFileType = file; path = look_LRUD_model.tflite; sourceTree = "<group>"; };
+		2466ABE622A9930B0060019E /* look_LRUD_labels.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = look_LRUD_labels.txt; sourceTree = "<group>"; };
 		248BBE7A22A03FED003856C5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		24B7D309229EB1DA00BC36B0 /* SensorData.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SensorData.swift; sourceTree = "<group>"; };
 		24B7D30D229EB3F100BC36B0 /* DataCollectionViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DataCollectionViewController.swift; sourceTree = "<group>"; };
@@ -110,14 +116,17 @@
 				2466ABD522A6EF0B0060019E /* head_nod_head_shake_model_config.yml */,
 				2466ABD122A586E70060019E /* look_left_look_up_model_config.yml */,
 				2466ABDB22A80CD20060019E /* nine_gestures_model_config.yml */,
+				2466ABE422A9930A0060019E /* look_LRUD_model_config.yml */,
 				24B7D316229EB7BD00BC36B0 /* activity_recognition_model.tflite */,
 				2466ABD422A6EF0B0060019E /* head_nod_head_shake_model.tflite */,
 				2466ABE222A813EF0060019E /* nine_gestures_model.tflite */,
 				24B7D31C229EC12200BC36B0 /* look_left_look_up_model.tflite */,
+				2466ABE522A9930B0060019E /* look_LRUD_model.tflite */,
 				24B7D317229EB7BD00BC36B0 /* activity_recognition_labels.txt */,
 				2466ABD322A6EF0B0060019E /* head_nod_head_shake_labels.txt */,
 				24B7D31B229EC12200BC36B0 /* look_left_look_up_labels.txt */,
 				2466ABDD22A80CD30060019E /* nine_gestures_labels.txt */,
+				2466ABE622A9930B0060019E /* look_LRUD_labels.txt */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -286,14 +295,17 @@
 			files = (
 				2466ABE322A813EF0060019E /* nine_gestures_model.tflite in Resources */,
 				248BBE7B22A03FED003856C5 /* Main.storyboard in Resources */,
+				2466ABE822A9930B0060019E /* look_LRUD_model.tflite in Resources */,
 				24B7D319229EB7BD00BC36B0 /* activity_recognition_model.tflite in Resources */,
 				24B7D31D229EC12200BC36B0 /* look_left_look_up_labels.txt in Resources */,
+				2466ABE922A9930B0060019E /* look_LRUD_labels.txt in Resources */,
 				2466ABD822A6EF0C0060019E /* head_nod_head_shake_model_config.yml in Resources */,
 				2466ABD722A6EF0C0060019E /* head_nod_head_shake_model.tflite in Resources */,
 				24B7D31A229EB7BD00BC36B0 /* activity_recognition_labels.txt in Resources */,
 				2466ABD022A53B290060019E /* activity_recognition_model_config.yml in Resources */,
 				C568AC5B21AC6E2F00FFE42E /* Assets.xcassets in Resources */,
 				2466ABE022A80CD30060019E /* nine_gestures_labels.txt in Resources */,
+				2466ABE722A9930B0060019E /* look_LRUD_model_config.yml in Resources */,
 				2466ABD622A6EF0C0060019E /* head_nod_head_shake_labels.txt in Resources */,
 				C568AC5C21AC6E2F00FFE42E /* LaunchScreen.storyboard in Resources */,
 				2466ABDE22A80CD30060019E /* nine_gestures_model_config.yml in Resources */,
