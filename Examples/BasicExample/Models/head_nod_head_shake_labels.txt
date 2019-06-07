@@ -1,2 +1,0 @@
-head_nod
-head_shake

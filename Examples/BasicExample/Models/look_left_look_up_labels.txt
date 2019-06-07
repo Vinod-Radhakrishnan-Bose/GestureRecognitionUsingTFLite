@@ -1,2 +1,0 @@
-look_up
-look_left

@@ -12,17 +12,17 @@ import Charts
 /// A result from invoking the `Interpreter`.
 class SensorData {
     var dataX:[Double] // array for storing X-dimension of sensor data
+    var interpolatedDataX:[Double] // Array for storing interpolated sensor data X-dimension for Debug purposes
     var dataY:[Double] // Y-dimension and
+    var interpolatedDataY:[Double] // Y-dimension interpolated data and
     var dataZ:[Double] // Z-dimension
+    var interpolatedDataZ:[Double] // Z-dimension interpolated data.
     var dataTimeStamp:[Double] // array for unwrapped timestamps (converted to double) corresponding to sensor data
     var prevDataTimeStamp:UInt16 // array for wrapped timestamp for previous data point. Used
                                  // to detect wraparounds in sensor timestamp
     var maxDataTimeStamp:Int64   // unwrapped base timestamp for historical data. This will be
                                  // added to the wrapped timestamp to create the unwrapped timestamp
                                  // for each new data point
-    var interpolatedDataX:[Double] // Array for storing interpolated sensor data X-dimension for Debug purposes
-    var interpolatedDataY:[Double] // Y-dimension interpolated data and
-    var interpolatedDataZ:[Double] // Z-dimension interpolated data.
     var logFileName = "" // Filename for logging sensor data
     var logFileURL:URL? = nil
     var sensorType:String=""
@@ -114,12 +114,12 @@ class SensorData {
         let millisecToSec = 0.001
         var vector_local = vector
         // Normalize accelerometer values
-        var normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_x")
-        vector_local.x /= normalization_factor
-        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_y")
-        vector_local.y /= normalization_factor
-        normalization_factor = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_z")
-        vector_local.z /= normalization_factor
+        var (min_value, max_value) = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_x")
+        vector_local.x = (vector_local.x - min_value)/(max_value - min_value)
+        (min_value, max_value) = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_y")
+        vector_local.y = (vector_local.y - min_value)/(max_value - min_value)
+        (min_value, max_value) = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_z")
+        vector_local.z = (vector_local.z - min_value)/(max_value - min_value)
 
         if self.prevDataTimeStamp == 0 &&
             self.maxDataTimeStamp == 0 {

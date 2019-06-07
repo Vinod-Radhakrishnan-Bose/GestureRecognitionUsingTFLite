@@ -72,7 +72,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
 
         do {
             modelDataHandler =
-                ModelDataHandler(configFileName: "look_LRUD_model_config.yml")
+                ModelDataHandler(configFileName: "seven_gestures_model_config.yml")
             guard modelDataHandler != nil else {
                 fatalError("Model set up failed")
             }

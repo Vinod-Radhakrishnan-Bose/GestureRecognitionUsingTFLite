@@ -203,3 +203,4 @@ Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLParser.swift
 Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLRegex.swift
 Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLResult.swift
 Examples/BasicExample/Pods/Yaml/Sources/Yaml/YAMLTokenizer.swift
+Examples/BasicExample/Source/SensorDim.swift

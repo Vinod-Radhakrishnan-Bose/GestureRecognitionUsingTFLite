@@ -33,7 +33,8 @@ class ModelDataHandler {
     var resultCount = 1 // Number of results to report
     var numSamplesPerSensorDim = 100 // Number of values per sensor-dimension (i.e. number of values of accel-x, number of values of accel-y etc.)
     var sensorDimOrdering:[String] = [] // How should data be formatted before invoking model (for ex. <-- accel_x array ---> <--- accel-y array> etc.
-    var sensorDimNormalization:[Double] = [] // Normalization values used for each data dimension
+    var sensorDimMax:[Double] = [] // Max Normalization values used for each data dimension
+    var sensorDimMin:[Double] = [] // Max Normalization values used for each data dimension
     var modelSamplePeriod:Int = 20 // Sample period which was used for model training in ms
 
     // MARK: - Private Properties
@@ -64,7 +65,8 @@ class ModelDataHandler {
             for index in 0..<configuration["data_format"]["sensor_dimension_ordering"].count! {
                 let sensorDim = configuration["data_format"]["sensor_dimension_ordering"][index].string!
                 sensorDimOrdering.append(sensorDim)
-                sensorDimNormalization.append(configuration["data_format"]["normalization_value"][index].double!)
+                sensorDimMax.append(configuration["data_format"]["max_values"][index].double!)
+                sensorDimMin.append(configuration["data_format"]["min_values"][index].double!)
             }
             modelSamplePeriod = configuration["data_format"]["sample_period"].int!
             labels = loadLabels(fileInfo: labelInfo)
@@ -88,7 +90,7 @@ class ModelDataHandler {
         return (predictionLabel ?? "Error", confidenceLabel)
     }
     
-    func runModel(input: Data) -> Result? {
+    private func runModel(input: Data) -> Result? {
 
         let interval: TimeInterval
         let outputTensor: Tensor
@@ -152,12 +154,12 @@ class ModelDataHandler {
         return sortedResults.map { result in Inference(confidence: result.1, label: labels[result.0]) }
     }
 
-    func returnSensorDimensionNormalizationValue(name:String)->Double {
+    func returnSensorDimensionNormalizationValue(name:String)->(Double, Double) {
         let index = sensorDimOrdering.lastIndex(of: name)
         if index != nil {
-            return sensorDimNormalization[index!]
+            return (sensorDimMin[index!], sensorDimMax[index!])
         } else {
-            return 1.0
+            return (0.0, 1.0)
         }
     }
 }
@@ -185,7 +187,7 @@ extension Array {
     }
 }
 
-func loadModel(modelFileInfo: FileInfo, threadCount: Int = 1, configuredResultCount: Int = 3) -> Interpreter? {
+private func loadModel(modelFileInfo: FileInfo, threadCount: Int = 1, configuredResultCount: Int = 3) -> Interpreter? {
     let modelFilename = modelFileInfo.name
     var interpreter : Interpreter
     // Construct the path to the model file.

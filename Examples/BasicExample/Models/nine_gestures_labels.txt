@@ -1,9 +1,0 @@
-non_event
-head_nod
-head_shake
-tilt_left
-tilt_right
-look_left
-look_right
-look_up
-look_down

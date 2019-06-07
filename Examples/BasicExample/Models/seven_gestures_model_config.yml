@@ -1,0 +1,12 @@
+labels_filename: seven_gestures_labels.txt
+model_filename: seven_gestures_model.tflite
+num_results: 1
+data_format:
+  num_values_per_sensor_dimenion: 75
+  sample_period: 10
+  sensor_dimension_ordering:
+    - gyro_x
+    - gyro_y
+    - gyro_z
+  max_values: [5857.3125, 7194.645833333333, 8009.645833333333]
+  min_values: [-6743.020833333333, -6923.322916666667, -8124.09375]
