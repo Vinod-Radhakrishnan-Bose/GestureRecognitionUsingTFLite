@@ -42,8 +42,11 @@ class DeviceData{
     
     func aggregateData(sensorDimOrdering : [String], numSamplesPerSensorDim : Int) {
         aggregatedData = []
-        for index in 0..<sensorDimOrdering.count {
-            aggregatedData += returnSensorDimension(name:sensorDimOrdering[index]).suffix(numSamplesPerSensorDim)
+        for sampleIndex in 0..<numSamplesPerSensorDim {
+            for index in 0..<sensorDimOrdering.count {
+                let arr = returnSensorDimension(name:sensorDimOrdering[index])
+                aggregatedData.append(arr[arr.count - numSamplesPerSensorDim + sampleIndex])
+            }
         }
     }
     func flushDataBuffers() {
