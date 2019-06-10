@@ -36,6 +36,8 @@ class ModelDataHandler {
     var sensorDimMax:[Double] = [] // Max Normalization values used for each data dimension
     var sensorDimMin:[Double] = [] // Max Normalization values used for each data dimension
     var modelSamplePeriod:Int = 20 // Sample period which was used for model training in ms
+    var logFileName = "" // Filename for logging sensor data
+    var logFileURL:URL? = nil
 
     // MARK: - Private Properties
     
@@ -44,6 +46,8 @@ class ModelDataHandler {
     
     /// TensorFlow Lite `Interpreter` object for performing inference on a given model.
     private var interpreter: Interpreter
+
+    private var firstWriteToLogFile:Bool = true
 
     /// A failable initializer for `ModelDataHandler`. A new instance is created if the model and
     /// labels files are successfully loaded from the app's main bundle. Default `threadCount` is 1.
@@ -73,21 +77,54 @@ class ModelDataHandler {
         } catch {
             fatalError("Invalid Sig Def YAML file. Try again.")
         }
+        let fileStartRecordTimeStamp = getCurrentTimeStamp()
+        logFileName = "inference_data_" + fileStartRecordTimeStamp + ".csv"
+        let fileManager = FileManager.default
+        let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentDirectory = urls[0] as NSURL
+        logFileURL = documentDirectory.appendingPathComponent(logFileName)
     }
     
-    func predictActivity(aggregatedData:[Double]) -> (String, String) {
+    func predictActivity(deviceData: DeviceData) -> (String, String) {
         
         var sensorDataBytes : [Float] = []
-        
+        var aggregatedData : [Double] = []
+        aggregatedData = self.aggregateData(deviceData:deviceData)
         for (_, element) in aggregatedData.enumerated() {
             sensorDataBytes.append(Float(element))
         }
         // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
         let result = runModel(input: Data(buffer: UnsafeBufferPointer(start: sensorDataBytes, count: sensorDataBytes.count)))
         //Changing the text of the predictionLabel
-        let predictionLabel = result?.inferences[0].label//prediction?.classLabel
-        let confidenceLabel = String(describing : Int16((result?.inferences[0].confidence) ?? 0.0 * 100.0)) + "%\n"
-        return (predictionLabel ?? "Error", confidenceLabel)
+        let predictionLabel = result?.inferences[0].label ?? "Error"
+        let confidenceLabel = String(describing : Int16((result?.inferences[0].confidence ?? 0.0) * 100.0))
+        
+        var inferenceData:String = predictionLabel + "," + confidenceLabel + ","
+        for sampleIndex in 0..<aggregatedData.count {
+            inferenceData += "\(String(describing: aggregatedData[sampleIndex])),"
+        }
+        inferenceData += "\n"
+        self.writeToLogFile(txt: inferenceData)
+        
+        return (predictionLabel, confidenceLabel)
+    }
+    
+    private func aggregateData(deviceData : DeviceData) -> [Double] {
+        var aggregatedData : [Double] = []
+        var inferenceData:String = ""
+
+        for sampleIndex in 0..<numSamplesPerSensorDim {
+            for index in 0..<sensorDimOrdering.count {
+                let arr = deviceData.returnSensorDimension(name:sensorDimOrdering[index])
+                let (min_value, max_value) = returnSensorDimensionNormalizationValue(name:sensorDimOrdering[index])
+                let dataPoint = (arr[arr.count - numSamplesPerSensorDim + sampleIndex] - min_value)/(max_value - min_value)
+                aggregatedData.append(dataPoint)
+                inferenceData += "\(String(describing: dataPoint)),"
+            }
+        }
+        inferenceData += "\n"
+        //self.writeToLogFile(txt: inferenceData)
+        return aggregatedData
     }
     
     private func runModel(input: Data) -> Result? {
@@ -161,6 +198,36 @@ class ModelDataHandler {
         } else {
             return (0.0, 1.0)
         }
+    }
+    
+    func writeToLogFile(txt:String)  {
+        if(firstWriteToLogFile)
+        {
+            var txt_string = self.writeLogFileHeader() + txt
+            let data = Data(txt_string.utf8)
+            firstWriteToLogFile = false
+            do {
+                try data.write(to: logFileURL!, options: .atomic)
+            } catch {
+                print(error)
+            }
+        }
+        else
+        {
+            do {
+                let fileHandle = try FileHandle(forWritingTo: logFileURL!)
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(txt.data(using: .utf8)!)
+                fileHandle.closeFile()
+            } catch {
+                print("Error writing to file \(error)")
+            }
+        }
+    }
+    
+    func writeLogFileHeader() -> String {
+        let dataHeader:String = "predicted activity, predicted confidence, data[0],data[1],data[2],...,...\n"
+        return dataHeader
     }
 }
 extension Array {

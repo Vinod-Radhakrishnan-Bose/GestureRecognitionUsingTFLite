@@ -6,7 +6,6 @@
 import BoseWearable
 import UIKit
 import MessageUI
-import CoreMotion
 import AVFoundation
 import Charts
 
@@ -45,9 +44,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
     
     var wavFileNameList = [String]()
     var wavTableCellSelected:Int?
-
-    let motionManager = CMMotionManager()
-        
+    
     // Handles all data preprocessing and makes calls to run inference through TfliteWrapper
     private var modelDataHandler: ModelDataHandler?
     
@@ -57,7 +54,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         predictionLabel.text = "Prediction: "
         confidenceLabel.text = "Confidence: "
         myTimer.text = "0"
-        sensorDispatch.handler = self as? SensorDispatchHandler
+        sensorDispatch.handler = self as SensorDispatchHandler
         
         // Do any additional setup after loading the view.
         startStopButton.isEnabled = true
@@ -65,11 +62,6 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         startStopButton.setTitle("Start Recording", for: .normal)
         startStopButton.backgroundColor = .green
         
-        
-        motionManager.startAccelerometerUpdates()
-        motionManager.startGyroUpdates()
-        motionManager.startMagnetometerUpdates()
-
         do {
             modelDataHandler =
                 ModelDataHandler(configFileName: "seven_gestures_model_config.yml")
@@ -91,7 +83,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
             activityIndicator = ActivityIndicator.add(to: navigationController?.view)
             
             // Register this view controller as the session delegate.
-            session.delegate = self as? WearableDeviceSessionDelegate
+            session.delegate = self as WearableDeviceSessionDelegate
             
             // Open the session.
             session.open()
@@ -212,9 +204,8 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         gyroChart.data = lineChart2
         
         // perform inferencing every 4 seconds
-        if counter % 4 == 0 {
-            deviceData.aggregateData(sensorDimOrdering: modelDataHandler!.sensorDimOrdering, numSamplesPerSensorDim: modelDataHandler!.numSamplesPerSensorDim)
-            let (prediction_label, prediction_confidence) = modelDataHandler!.predictActivity(aggregatedData: deviceData.aggregatedData)
+        if counter > 0 && counter % 4 == 0 {
+            let (prediction_label, prediction_confidence) = modelDataHandler!.predictActivity(deviceData: deviceData)
             predictionLabel.text = prediction_label
             confidenceLabel.text = prediction_confidence
         }
@@ -254,10 +245,10 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
                 mailComposer.addAttachmentData(GyroData as Data, mimeType: "text/txt", fileName: self.deviceData.gyro.logFileName)
             }
 
-            if let inferenceData = NSData(contentsOf: self.deviceData.logFileURL!) {
+            if let inferenceData = NSData(contentsOf: self.modelDataHandler!.logFileURL!) {
                 print("Inference data loaded.")
                 
-                mailComposer.addAttachmentData(inferenceData as Data, mimeType: "text/txt", fileName: self.deviceData.logFileName)
+                mailComposer.addAttachmentData(inferenceData as Data, mimeType: "text/txt", fileName: self.modelDataHandler!.logFileName)
             }
             
             self.navigationController?.present(mailComposer, animated: true, completion: nil)
@@ -290,19 +281,13 @@ extension DataCollectionViewController: SensorDispatchHandler {
             AccelData += "\(String(describing: timestamp)), "
             AccelData += "\(String(describing: vector.x)), "
             AccelData += "\(String(describing: vector.y)), "
-            AccelData += "\(String(describing: vector.z)),"
-            if let accelerometerData = motionManager.accelerometerData {
-                AccelData += "\(String(describing: accelerometerData.acceleration.x)), "
-                AccelData += "\(String(describing: accelerometerData.acceleration.y)), "
-                AccelData += "\(String(describing: accelerometerData.acceleration.z)) \n"
-                deviceData.accel.writeToLogFile(txt: AccelData)
-            }
+            AccelData += "\(String(describing: vector.z)) \n"
+            deviceData.accel.writeToLogFile(txt: AccelData)
             deviceData.accel.appendSensorData(timeStamp:timestamp, vector:vector, modelDataHandler: modelDataHandler!)
 
         }
     }
     func receivedGyroscope(vector: Vector, accuracy: VectorAccuracy, timestamp: SensorTimestamp)  {
-        var vector_local = vector
         if(dataCollectionStaretd)
         {
             var GyroData:String = ""
@@ -310,25 +295,16 @@ extension DataCollectionViewController: SensorDispatchHandler {
             GyroData += "\(String(describing: timestamp)), "
             GyroData += "\(String(describing: vector.x)), "
             GyroData += "\(String(describing: vector.y)), "
-            GyroData += "\(String(describing: vector.z)),"
-            //GyroData += commentTxtField.text + "\n"
-            
-            if let gyroData = motionManager.gyroData {
-                GyroData += "\(String(describing: gyroData.rotationRate.x)), "
-                GyroData += "\(String(describing: gyroData.rotationRate.y)), "
-                GyroData += "\(String(describing: gyroData.rotationRate.z)) \n"
-                deviceData.gyro.writeToLogFile(txt: GyroData)
-            }
-            deviceData.gyro.appendSensorData(timeStamp:timestamp, vector:vector_local, modelDataHandler: modelDataHandler!)
+            GyroData += "\(String(describing: vector.z)) \n"
+            deviceData.gyro.writeToLogFile(txt: GyroData)
+            deviceData.gyro.appendSensorData(timeStamp:timestamp, vector:vector, modelDataHandler: modelDataHandler!)
         }
     }
 
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?){
         view.endEditing(true)
         super.touchesBegan(touches, with: event)
-    }
-    
-    
+    }    
 }
 
 // MARK: - WearableDeviceSessionDelegate

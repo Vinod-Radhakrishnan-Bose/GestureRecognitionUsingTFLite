@@ -99,11 +99,7 @@ class SensorData {
         dataHeader += "timeStamp (ms), "
         dataHeader += "X, "
         dataHeader += "Y, "
-        dataHeader += "Z,"
-        dataHeader += "iPhone X,"
-        dataHeader += "iPhone Y,"
-        dataHeader += "iPhone Z \n"
-        
+        dataHeader += "Z \n"        
         return dataHeader
     }
     
@@ -112,14 +108,6 @@ class SensorData {
         var interpolationFactor = 1
         var decimationFactor = 1
         let millisecToSec = 0.001
-        var vector_local = vector
-        // Normalize accelerometer values
-        var (min_value, max_value) = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_x")
-        vector_local.x = (vector_local.x - min_value)/(max_value - min_value)
-        (min_value, max_value) = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_y")
-        vector_local.y = (vector_local.y - min_value)/(max_value - min_value)
-        (min_value, max_value) = modelDataHandler.returnSensorDimensionNormalizationValue(name: sensorType + "_z")
-        vector_local.z = (vector_local.z - min_value)/(max_value - min_value)
 
         if self.prevDataTimeStamp == 0 &&
             self.maxDataTimeStamp == 0 {
