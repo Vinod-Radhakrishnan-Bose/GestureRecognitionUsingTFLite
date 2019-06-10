@@ -253,6 +253,12 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
                 
                 mailComposer.addAttachmentData(GyroData as Data, mimeType: "text/txt", fileName: self.deviceData.gyro.logFileName)
             }
+
+            if let inferenceData = NSData(contentsOf: self.deviceData.logFileURL!) {
+                print("Inference data loaded.")
+                
+                mailComposer.addAttachmentData(inferenceData as Data, mimeType: "text/txt", fileName: self.deviceData.logFileName)
+            }
             
             self.navigationController?.present(mailComposer, animated: true, completion: nil)
         }

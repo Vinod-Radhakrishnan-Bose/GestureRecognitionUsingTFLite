@@ -12,12 +12,22 @@ class DeviceData{
     var aggregatedData:[Double]=[]
     var accel:SensorData
     var gyro:SensorData
+    var logFileName = "" // Filename for logging sensor data
+    var logFileURL:URL? = nil
+
+    private var firstWriteToLogFile:Bool = true
     
     init(){
         self.aggregatedData=[]
         self.accel = SensorData(initDataType:"accel")
         self.gyro = SensorData(initDataType:"gyro")
-    }
+        let fileStartRecordTimeStamp = getCurrentTimeStamp()
+        logFileName = "inference_data_" + fileStartRecordTimeStamp + ".csv"
+        let fileManager = FileManager.default
+        let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+        let documentDirectory = urls[0] as NSURL
+        logFileURL = documentDirectory.appendingPathComponent(logFileName)
+        firstWriteToLogFile = true    }
     
     func returnSensorDimension(name:String)->[Double] {
         var array:[Double]=[]
@@ -42,12 +52,17 @@ class DeviceData{
     
     func aggregateData(sensorDimOrdering : [String], numSamplesPerSensorDim : Int) {
         aggregatedData = []
+        var inferenceData:String = ""
         for sampleIndex in 0..<numSamplesPerSensorDim {
             for index in 0..<sensorDimOrdering.count {
                 let arr = returnSensorDimension(name:sensorDimOrdering[index])
-                aggregatedData.append(arr[arr.count - numSamplesPerSensorDim + sampleIndex])
+                let dataPoint = arr[arr.count - numSamplesPerSensorDim + sampleIndex]
+                aggregatedData.append(dataPoint)
+                inferenceData += "\(String(describing: dataPoint)),"
             }
         }
+        inferenceData += "\n"
+        self.writeToLogFile(txt: inferenceData)
     }
     func flushDataBuffers() {
         self.accel.flushSensorData()
@@ -59,6 +74,31 @@ class DeviceData{
         let gyroChart = self.gyro.updateSensorGraph()
         
         return (accelChart,gyroChart)
+    }
+    
+    func writeToLogFile(txt:String)  {
+        if(firstWriteToLogFile)
+        {
+            var txt_string = txt
+            let data = Data(txt_string.utf8)
+            firstWriteToLogFile = false
+            do {
+                try data.write(to: logFileURL!, options: .atomic)
+            } catch {
+                print(error)
+            }
+        }
+        else
+        {
+            do {
+                let fileHandle = try FileHandle(forWritingTo: logFileURL!)
+                fileHandle.seekToEndOfFile()
+                fileHandle.write(txt.data(using: .utf8)!)
+                fileHandle.closeFile()
+            } catch {
+                print("Error writing to file \(error)")
+            }
+        }
     }
 }
 
