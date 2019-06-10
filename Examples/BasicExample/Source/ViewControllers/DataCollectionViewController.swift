@@ -202,13 +202,7 @@ class DataCollectionViewController: UIViewController, MFMailComposeViewControlle
         let (lineChart1, lineChart2) =  self.deviceData.updateGraph()
         accelChart.data = lineChart1
         gyroChart.data = lineChart2
-        
-        // perform inferencing every 4 seconds
-        if counter > 0 && counter % 4 == 0 {
-            let (prediction_label, prediction_confidence) = modelDataHandler!.predictActivity(deviceData: deviceData)
-            predictionLabel.text = prediction_label
-            confidenceLabel.text = prediction_confidence
-        }
+
        //after 60 secs, recording will stop automatically. Beep will sound.
         if counter == 60
         {
@@ -284,7 +278,9 @@ extension DataCollectionViewController: SensorDispatchHandler {
             AccelData += "\(String(describing: vector.z)) \n"
             deviceData.accel.writeToLogFile(txt: AccelData)
             deviceData.accel.appendSensorData(timeStamp:timestamp, vector:vector, modelDataHandler: modelDataHandler!)
-
+            let (prediction_label, confidence_label) = modelDataHandler!.performInferenceIfNeeded(deviceData : deviceData)
+            predictionLabel.text = prediction_label
+            confidenceLabel.text = confidence_label
         }
     }
     func receivedGyroscope(vector: Vector, accuracy: VectorAccuracy, timestamp: SensorTimestamp)  {
@@ -298,6 +294,9 @@ extension DataCollectionViewController: SensorDispatchHandler {
             GyroData += "\(String(describing: vector.z)) \n"
             deviceData.gyro.writeToLogFile(txt: GyroData)
             deviceData.gyro.appendSensorData(timeStamp:timestamp, vector:vector, modelDataHandler: modelDataHandler!)
+            let (prediction_label, confidence_label) = modelDataHandler!.performInferenceIfNeeded(deviceData : deviceData)
+            predictionLabel.text = prediction_label
+            confidenceLabel.text = confidence_label
         }
     }
 

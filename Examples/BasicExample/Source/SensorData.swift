@@ -28,6 +28,7 @@ class SensorData {
     var sensorType:String=""
     
     private var firstWriteToLogFile:Bool = true
+    private var sensorDataReceiveCount = 0
     
     init(initDataX: [Double]? = [],
         initDataY: [Double]? = [],
@@ -68,6 +69,7 @@ class SensorData {
         interpolatedDataX.removeAll()
         interpolatedDataY.removeAll()
         interpolatedDataZ.removeAll()
+        resetReceiveCount()
     }
     
     func writeToLogFile(txt:String)  {
@@ -109,6 +111,8 @@ class SensorData {
         var decimationFactor = 1
         let millisecToSec = 0.001
 
+        appendReceiveCount()
+        
         if self.prevDataTimeStamp == 0 &&
             self.maxDataTimeStamp == 0 {
             self.prevDataTimeStamp = timeStamp
@@ -163,6 +167,17 @@ class SensorData {
         }
     }
     
+    func appendReceiveCount() {
+        self.sensorDataReceiveCount += 1
+    }
+    
+    func resetReceiveCount() {
+        self.sensorDataReceiveCount = 0
+    }
+
+    func getReceiveCount() -> Int {
+        return self.sensorDataReceiveCount
+    }
     func updateSensorGraph() -> LineChartData {
         let sensorLineChart = LineChartData() //This is the object that will be added to the chart
         let line1 : LineChartDataSet = addCurve(curveName : self.dataX, timestamps : self.dataTimeStamp, label : "Data-X", color : NSUIColor.blue)
@@ -171,8 +186,7 @@ class SensorData {
         let line4 : LineChartDataSet = addCurve(curveName : self.interpolatedDataX, timestamps : self.dataTimeStamp, label : "interpolatedData-X", color : NSUIColor.black)
         let line5 : LineChartDataSet = addCurve(curveName : self.interpolatedDataY, timestamps : self.dataTimeStamp, label : "interpolatedData-X", color : NSUIColor.cyan)
         let line6 : LineChartDataSet = addCurve(curveName : self.interpolatedDataZ, timestamps : self.dataTimeStamp, label : "interpolatedData-Z", color : NSUIColor.yellow)
-        
-        
+
         sensorLineChart.addDataSet(line1) //Adds the lines to the dataSet
         sensorLineChart.addDataSet(line2)
         sensorLineChart.addDataSet(line3)

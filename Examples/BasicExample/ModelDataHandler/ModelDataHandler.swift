@@ -32,13 +32,19 @@ class ModelDataHandler {
     // MARK: - Public Properties
     var resultCount = 1 // Number of results to report
     var numSamplesPerSensorDim = 100 // Number of values per sensor-dimension (i.e. number of values of accel-x, number of values of accel-y etc.)
+    var sampleHopSize = 25
     var sensorDimOrdering:[String] = [] // How should data be formatted before invoking model (for ex. <-- accel_x array ---> <--- accel-y array> etc.
     var sensorDimMax:[Double] = [] // Max Normalization values used for each data dimension
     var sensorDimMin:[Double] = [] // Max Normalization values used for each data dimension
     var modelSamplePeriod:Int = 20 // Sample period which was used for model training in ms
     var logFileName = "" // Filename for logging sensor data
     var logFileURL:URL? = nil
-
+    var predictionHistory : [String] = []
+    var confidenceHistory : [Int] = []
+    var lengthOfHistory : Int = 3
+    var most_recent_prediction_label : String = "non_event"
+    var most_recent_prediction_confidence : String = String(0)
+    
     // MARK: - Private Properties
     
     /// List of labels from the given labels file.
@@ -66,6 +72,12 @@ class ModelDataHandler {
             interpreter = loadModel(modelFileInfo: modelInfo, configuredResultCount: resultCount)!
             
             numSamplesPerSensorDim = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
+            sampleHopSize = configuration["data_format"]["hop_per_dimension"].int!
+            lengthOfHistory = configuration["data_format"]["length_of_history"].int!
+            for _ in 0..<lengthOfHistory {
+                predictionHistory.append("non_event")
+                confidenceHistory.append(100)
+            }
             for index in 0..<configuration["data_format"]["sensor_dimension_ordering"].count! {
                 let sensorDim = configuration["data_format"]["sensor_dimension_ordering"][index].string!
                 sensorDimOrdering.append(sensorDim)
@@ -228,6 +240,47 @@ class ModelDataHandler {
     func writeLogFileHeader() -> String {
         let dataHeader:String = "predicted activity, predicted confidence, data[0],data[1],data[2],...,...\n"
         return dataHeader
+    }
+    
+    func performInferenceIfNeeded(deviceData : DeviceData) -> (String, String) {
+        // perform inferencing every sampleHopSize samples
+        if ((deviceData.accel.getReceiveCount() > sampleHopSize || deviceData.gyro.getReceiveCount() > sampleHopSize) &&
+            (deviceData.accel.dataX.count > numSamplesPerSensorDim) && (deviceData.gyro.dataX.count > numSamplesPerSensorDim)){
+            (most_recent_prediction_label, most_recent_prediction_confidence) = self.predictActivity(deviceData: deviceData)
+            deviceData.accel.resetReceiveCount()
+            deviceData.gyro.resetReceiveCount()
+            predictionHistory.append(most_recent_prediction_label)
+            predictionHistory.removeFirst()
+            confidenceHistory.append(Int(most_recent_prediction_confidence) ?? 0)
+            confidenceHistory.removeFirst()
+            (most_recent_prediction_label, most_recent_prediction_confidence) = postProcessPrediction(predictionHistory:predictionHistory,confidenceHistory:confidenceHistory)
+        }
+        return (most_recent_prediction_label, most_recent_prediction_confidence)
+    }
+    
+    func postProcessPrediction(predictionHistory : [String], confidenceHistory : [Int]) -> (String, String) {
+        let (prediction, count) = mostFrequentPrediction(array:predictionHistory)!
+        var confidence_average = 0
+        for index in 0..<predictionHistory.count {
+            if predictionHistory[index] == prediction {
+                confidence_average += confidenceHistory[index]
+            }
+        }
+        confidence_average = Int(Float(confidence_average)/Float(count))
+        return (prediction, String(confidence_average))
+    }
+    
+    func mostFrequentPrediction(array: [String]) -> (value: String, count: Int)? {
+        var counts = [String: Int]()
+        
+        array.forEach { counts[$0] = (counts[$0] ?? 0) + 1 }
+        
+        if let (value, count) = counts.max(by: {$0.1 < $1.1}) {
+            return (value, count)
+        }
+        
+        // array was empty
+        return nil
     }
 }
 extension Array {
