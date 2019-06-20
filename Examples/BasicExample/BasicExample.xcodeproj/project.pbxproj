@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		241CB9FB22AEE41D0084CDBB /* seven_gestures_model.mlmodel in Sources */ = {isa = PBXBuildFile; fileRef = 241CB9FA22AEE41D0084CDBB /* seven_gestures_model.mlmodel */; };
 		2466ABD022A53B290060019E /* activity_recognition_model_config.yml in Resources */ = {isa = PBXBuildFile; fileRef = 2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */; };
 		2466ABDA22A6FE0D0060019E /* DeviceData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2466ABD922A6FE0D0060019E /* DeviceData.swift */; };
 		2466ABEB22A9A4FA0060019E /* SensorDim.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2466ABEA22A9A4FA0060019E /* SensorDim.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		241CB9FA22AEE41D0084CDBB /* seven_gestures_model.mlmodel */ = {isa = PBXFileReference; lastKnownFileType = file.mlmodel; path = seven_gestures_model.mlmodel; sourceTree = "<group>"; };
 		2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = activity_recognition_model_config.yml; sourceTree = "<group>"; };
 		2466ABD922A6FE0D0060019E /* DeviceData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DeviceData.swift; sourceTree = "<group>"; };
 		2466ABEA22A9A4FA0060019E /* SensorDim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SensorDim.swift; sourceTree = "<group>"; };
@@ -99,6 +101,7 @@
 				2466ABCF22A53B290060019E /* activity_recognition_model_config.yml */,
 				24B7D316229EB7BD00BC36B0 /* activity_recognition_model.tflite */,
 				24B7D317229EB7BD00BC36B0 /* activity_recognition_labels.txt */,
+				241CB9FA22AEE41D0084CDBB /* seven_gestures_model.mlmodel */,
 				2466ABED22AAAEBE0060019E /* seven_gestures_labels.txt */,
 				2466ABEE22AAAEBE0060019E /* seven_gestures_model_config.yml */,
 				2466ABEC22AAAEBE0060019E /* seven_gestures_model.tflite */,
@@ -346,6 +349,7 @@
 				C5D40926221879FC0069DF66 /* ActivityIndicator.swift in Sources */,
 				C568AC8A21AC8CB700FFE42E /* UIViewController+Alert.swift in Sources */,
 				C568AC3C21AC6D9F00FFE42E /* AppDelegate.swift in Sources */,
+				241CB9FB22AEE41D0084CDBB /* seven_gestures_model.mlmodel in Sources */,
 				2466ABDA22A6FE0D0060019E /* DeviceData.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

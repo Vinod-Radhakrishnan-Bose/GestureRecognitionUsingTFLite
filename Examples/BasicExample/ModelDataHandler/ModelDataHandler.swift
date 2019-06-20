@@ -8,6 +8,7 @@
 
 import TensorFlowLite
 import Yaml
+import CoreML
 
 /// A result from invoking the `Interpreter`.
 struct Result {
@@ -19,6 +20,11 @@ struct Result {
 struct Inference {
     let confidence: Float
     let label: String
+}
+
+enum ModelType {
+    case tflite
+    case coreml
 }
 
 /// Information about a model file or labels file.
@@ -44,6 +50,8 @@ class ModelDataHandler {
     var lengthOfHistory : Int = 3
     var most_recent_prediction_label : String = "non_event"
     var most_recent_prediction_confidence : String = String(0)
+    var mlMultiArrayInput = try? MLMultiArray(shape:[225], dataType:MLMultiArrayDataType.double)
+    var modelType : ModelType = .tflite
     
     // MARK: - Private Properties
     
@@ -51,7 +59,9 @@ class ModelDataHandler {
     private var labels: [String] = []
     
     /// TensorFlow Lite `Interpreter` object for performing inference on a given model.
-    private var interpreter: Interpreter
+    private var interpreter : Interpreter
+    
+    private var coreMLModel : seven_gestures_model
 
     private var firstWriteToLogFile:Bool = true
 
@@ -67,10 +77,12 @@ class ModelDataHandler {
             let contents = try String(contentsOf: fileURL, encoding: .utf8)
             let configuration = try! Yaml.load(contents)
             resultCount = configuration["num_results"].int!
-            let modelInfo:FileInfo = (name:configuration["model_filename"].string!, extension:"")
+            let modelName = configuration["model_filename"].string!
+            //if (name.components(separatedBy: ".").last! == "tflite")
+            let modelInfo:FileInfo = (name:modelName, extension:"")
             let labelInfo:FileInfo = (name:configuration["labels_filename"].string!, extension:"")
             interpreter = loadModel(modelFileInfo: modelInfo, configuredResultCount: resultCount)!
-            
+            coreMLModel = seven_gestures_model()
             numSamplesPerSensorDim = configuration["data_format"]["num_values_per_sensor_dimenion"].int!
             sampleHopSize = configuration["data_format"]["hop_per_dimension"].int!
             lengthOfHistory = configuration["data_format"]["length_of_history"].int!
@@ -102,11 +114,18 @@ class ModelDataHandler {
         var sensorDataBytes : [Float] = []
         var aggregatedData : [Double] = []
         aggregatedData = self.aggregateData(deviceData:deviceData)
-        for (_, element) in aggregatedData.enumerated() {
+        for (index, element) in aggregatedData.enumerated() {
             sensorDataBytes.append(Float(element))
+            mlMultiArrayInput![index] = NSNumber(floatLiteral: element)
         }
+
         // Pass the  buffered sensor data to TensorFlow Lite to perform inference.
         let result = runModel(input: Data(buffer: UnsafeBufferPointer(start: sensorDataBytes, count: sensorDataBytes.count)))
+        let coreMLResult = try? coreMLModel.prediction(input: seven_gestures_modelInput(IMU_Sensor_Bose_Frames: mlMultiArrayInput!))
+        print("Predicted label:")
+        print(coreMLResult?.classLabel ?? "No prediction possible")
+        print("Probability per label:")
+        print(coreMLResult?.output ?? "No prediction possible")
         //Changing the text of the predictionLabel
         let predictionLabel = result?.inferences[0].label ?? "Error"
         let confidenceLabel = String(describing : Int16((result?.inferences[0].confidence ?? 0.0) * 100.0))
